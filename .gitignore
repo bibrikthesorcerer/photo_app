@@ -1,2 +1,5 @@
 poetry.lock
 .env
+.vscode
+__pycache__
+debug.py

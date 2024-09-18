@@ -1,0 +1,15 @@
+from django.contrib import admin
+from ...models import PhotoVersion
+
+@admin.register(PhotoVersion)
+class PhotoVersionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'photo_id', 'author', 'status']
+    search_fields = ['title', 'author', 'status', 'description']
+
+    @admin.display(description="Author")
+    def author(self, obj):
+        return f'{obj.photo.user.username}'
+
+    @admin.display(description="Photo ID")
+    def photo_id(self, obj):
+        return f'{obj.photo.id}'
