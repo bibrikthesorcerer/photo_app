@@ -1,16 +1,16 @@
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 
 SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True#config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 
 # Build paths inside the project like this: BASE_DIR / 'conf' / 'settings'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Application definition
@@ -22,6 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'models_app.apps.ModelsAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -34,7 +36,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'photo_app.urls'
+ROOT_URLCONF = 'conf.urls'
 
 TEMPLATES = [
     {
@@ -52,7 +54,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'photo_app.wsgi.application'
+WSGI_APPLICATION = 'conf.wsgi.application'
+
+AUTH_USER_MODEL = 'models_app.UserProfile'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
