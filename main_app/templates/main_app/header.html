@@ -1,0 +1,42 @@
+<header>
+    <nav class="navbar navbar-expand bg-body-tertiary border-bottom">
+
+        <div class="container-fluid">
+            <a href="/" class="navbar-brand">PhotoApp</a>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav">
+                  <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </div>
+            </div>
+            
+            {% if user.is_authenticated %}
+            <a type="button" class="btn" role="button" href="/profile/">
+                <img src="https://avatars.githubusercontent.com/u/{{user.social_auth.first.extra_data.id}}"
+                alt="PFP"
+                style="border-radius: 50%; height: 40px; width: 40px;"
+                class="mx-2">
+                
+                <strong>{{user.username}}</strong>
+            </a >
+            
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                    <button role="button" type="submit" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#5f6368"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                    </button>
+                </form>
+            </div>
+
+            {% else %}
+
+            <!-- GitHub OAuth redirect -->
+            <a type="button" class="btn btn-success" role="button"
+            href="{% url 'social:begin' 'github' %}">
+                Login via GitHub
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+</header>

@@ -1,11 +1,9 @@
 import factory
 from django.utils.timezone import now
 
-from ...constants import models_const
-
 class PhotoFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models_const.get('Photo')
+        model = 'models_app.Photo'
 
     # user
     # like_set

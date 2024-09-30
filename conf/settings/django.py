@@ -3,7 +3,7 @@ from decouple import config, Csv
 
 SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = True#config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
@@ -23,7 +23,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'social_django',
+    'service_objects',
     'models_app.apps.ModelsAppConfig',
+    'main_app.apps.MainAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -58,8 +61,23 @@ WSGI_APPLICATION = 'conf.wsgi.application'
 
 AUTH_USER_MODEL = 'models_app.UserProfile'
 
+# Authentication
+
+SOCIAL_AUTH_JSONFIELD_ENABLED = config('AUTH_JSONB', default=True, cast=bool)
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.github.GithubOAuth2',
+]
+
+SOCIAL_AUTH_GITHUB_KEY = config('AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = config('AUTH_GITHUB_SECRET')
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

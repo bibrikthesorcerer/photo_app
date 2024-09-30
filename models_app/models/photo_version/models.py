@@ -1,9 +1,8 @@
 from django.db import models
 from ..meta_abstract.models import MetaAbstract
-from ...constants import models_const
 
 class PhotoVersion(MetaAbstract):
-    photo = models.ForeignKey(models_const.get('Photo'), on_delete=models.CASCADE)
+    photo = models.ForeignKey('models_app.Photo', on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     pub_date = models.DateTimeField(auto_now=True)
