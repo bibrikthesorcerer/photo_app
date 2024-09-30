@@ -1,11 +1,9 @@
 import factory
 from django.utils.timezone import now
 
-from ...constants import models_const
-
 class CommentFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models_const.get('Comment')
+        model = 'models_app.Comment'
 
     # user
     # photo

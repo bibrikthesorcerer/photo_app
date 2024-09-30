@@ -5,7 +5,7 @@ from ...constants import models_const
 
 class UserProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models_const.get('UserProfile')
+        model = 'models_app.UserProfile')
 
     username = factory.Faker('user_name')
     email = factory.Faker('email')
