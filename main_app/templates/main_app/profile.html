@@ -1,0 +1,50 @@
+{% extends 'main_app/base.html' %}
+
+{% block head %}
+<title>Profile | PhotoApp</title>
+{% endblock %}
+
+{% block body %}
+<div class="mx-3">
+    <ul class="nav nav-underline mb-3" id="profileTabList" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="true">Profile</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-tab-pane" type="button" role="tab" aria-controls="edit-tab-pane" aria-selected="false">Edit</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="profiletabContent">
+
+        <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            
+            <img src="{{avatar}}" style="border-radius: 50%;" alt="{{user.username}}'s avatar" height="10%" width="10%">
+            <h1> {{user.username}} </h1>
+
+            <!-- List of Posts -->
+            {% if ph|length %}
+                <h3>Posts:</h3>
+
+                <ul>
+                {% for ph in photos %}
+                    <li>{{ph.title}}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <h3>You've made no posts yet</h3>
+            {% endif %}
+        </div>
+        
+        <!-- Edit Profile Info -->
+        <div class="tab-pane fade" id="edit-tab-pane" role="tabpanel" aria-labelledby="edit-tab" tabindex="0">
+            
+            <h3>Edit Profile Info</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form }}
+                <button type="submit" value="Submit" class="btn btn-success my-3">Submit</button>
+            </form>
+        </div>
+      </div>
+</div>
+{% endblock %}
