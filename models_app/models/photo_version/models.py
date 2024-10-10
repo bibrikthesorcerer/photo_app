@@ -5,7 +5,7 @@ class PhotoVersion(MetaAbstract):
     photo = models.ForeignKey('models_app.Photo', on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
-    pub_date = models.DateTimeField(auto_now=True)
+    pub_date = models.DateTimeField(null=True, default=None, blank=True)
     path = models.CharField(max_length=256)
     status = models.CharField(max_length=16)
 

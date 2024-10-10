@@ -3,11 +3,12 @@ from models_app.models import Photo
 from django import forms
 
 class ReadAllPhotos(Service):
+    
     def process(self):
-            self.photos = Photo.objects.all()
-            return self.photos
+            return Photo.objects.all()
 
 class ReadPhotoByUserID(Service):
       user_id = forms.IntegerField()
+
       def process(self):
             return Photo.objects.filter(user=self.cleaned_data['user_id'])

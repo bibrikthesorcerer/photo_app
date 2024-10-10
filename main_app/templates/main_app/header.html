@@ -11,6 +11,10 @@
             </div>
             
             {% if user.is_authenticated %}
+            <a type="button" class="btn" role="button" href="/upload/">
+                <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#5f6368"><path d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
+            </a>
+
             <a type="button" class="btn" role="button" href="/profile/">
                 <img src="https://avatars.githubusercontent.com/u/{{user.social_auth.first.extra_data.id}}"
                 alt="PFP"

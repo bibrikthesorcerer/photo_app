@@ -18,18 +18,17 @@
 
         <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
             
-            <img src="{{avatar}}" style="border-radius: 50%;" alt="{{user.username}}'s avatar" height="10%" width="10%">
-            <h1> {{user.username}} </h1>
-
+            <div class="d-flex">
+              <img src="{{avatar}}" style="border-radius: 50%;" alt="{{user.username}}'s avatar" height="7%" width="7%">
+              <div class="mx-3">
+                <h1>{{user.username}} </h1>
+                <p class="bg-body-tertiary rounded px-3 py-1">{{user.first_name}} {{user.last_name}}<br>{{user.email}}</p>
+              </div>
+            </div>
+            <hr>
             <!-- List of Posts -->
-            {% if ph|length %}
-                <h3>Posts:</h3>
-
-                <ul>
-                {% for ph in photos %}
-                    <li>{{ph.title}}</li>
-                {% endfor %}
-                </ul>
+            {% if photos|length %}
+                {% include 'main_app/profile_posts_list.html' %}
             {% else %}
                 <h3>You've made no posts yet</h3>
             {% endif %}

@@ -1,0 +1,28 @@
+{% load static %}
+{% load filters %}
+
+<h3>Posts:</h3>
+<div class="row row-cols-auto">
+{% for ph in photos %}
+    <div class="col">
+        <div class="card" style="width: 18rem;">
+            <img src="{{ ph.img.url  | get_thumbnail}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
+            <div class="card-body bg-body-tertiary">
+                <div class="card-title">
+                    <h5>{{ph.title}}</h5>
+                    <span class="badge rounded-pill text-bg-primary">
+                        {% if ph.status %}
+                            {{ph.status}}
+                        {% else %}
+                            no status yet
+                        {% endif %}
+                    </span>
+                </div>
+                <hr>
+                <p class="card-text">{{ph.description}}</p>
+                <a href="#" class="btn btn-primary">Edit</a>
+            </div>
+          </div>
+    </div>
+{% endfor %}
+</div>
