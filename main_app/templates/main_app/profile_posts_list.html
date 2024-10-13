@@ -5,7 +5,7 @@
 <div class="row row-cols-auto">
 {% for ph in photos %}
     <div class="col">
-        <div class="card" style="width: 18rem;">
+        <div class="card shadow-sm" style="width: 18rem;">
             <img src="{{ ph.img.url  | get_thumbnail}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
             <div class="card-body bg-body-tertiary">
                 <div class="card-title">
@@ -20,7 +20,8 @@
                 </div>
                 <hr>
                 <p class="card-text">{{ph.description}}</p>
-                <a href="#" class="btn btn-primary">Edit</a>
+                <a href="{% url 'main_app:view_photo_versions' ph.id %}" class="btn btn-primary">Versions</a>
+                <a href="{% url 'main_app:edit_photo' ph.id %}" class="btn btn-primary">Edit</a>
             </div>
           </div>
     </div>

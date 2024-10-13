@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 
-from models_app.models.photo.img_upl import uploaded_file_path, skip_saving_file, save_file
+from models_app.models.img_upl import uploaded_file_path, skip_saving_file, save_file
 from ..meta_abstract.models import MetaAbstract
 
 class Photo(MetaAbstract):

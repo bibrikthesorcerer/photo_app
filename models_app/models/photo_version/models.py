@@ -1,4 +1,5 @@
 from django.db import models
+
 from ..meta_abstract.models import MetaAbstract
 
 class PhotoVersion(MetaAbstract):
@@ -6,8 +7,8 @@ class PhotoVersion(MetaAbstract):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     pub_date = models.DateTimeField(null=True, default=None, blank=True)
-    path = models.CharField(max_length=256)
     status = models.CharField(max_length=16)
+    img = models.ImageField()
 
     def __str__(self):
         return f"{self.photo.title} - version"

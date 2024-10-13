@@ -1,10 +1,7 @@
 from django.forms import ModelForm
 from models_app.models import Photo
 
-class PhotoForm(ModelForm):   
-    class Meta:
-        model = Photo
-        fields = ('title', 'description', 'img')
+class PhotoForm(ModelForm): 
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -13,5 +10,8 @@ class PhotoForm(ModelForm):
             elem.widget.attrs['class'] = 'form-control'
 
     def save(self, commit=True):
-        self.photo = super().save()  
-        return self.photo
+        return super().save(commit=commit)
+    
+    class Meta:
+        model = Photo
+        fields = ('title', 'description', 'img')

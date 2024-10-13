@@ -5,7 +5,6 @@ from django.core.files import File
 from django.db import models
 from django.db.models.fields.files import FieldFile
 
-
 def uploaded_file_path(instance: models.Model, filename: str) -> str:
     path = re.sub(r"(\d.+)(\d{3})(\d{3})$", r"\1/\2/\3", f"{instance.id:09d}")
     try:

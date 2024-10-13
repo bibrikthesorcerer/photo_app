@@ -4,11 +4,6 @@ from models_app.models.user_profile.models import UserProfile
 import os.path
 
 register = template.Library()
-
-@register.filter()
-def count_likes(value: Photo) -> int:
-    if isinstance(value, Photo):
-        return value.like_set.all().count()
     
 @register.filter()
 def is_liked(value: Photo, req_user: UserProfile) -> bool:

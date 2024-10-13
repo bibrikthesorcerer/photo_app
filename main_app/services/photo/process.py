@@ -29,16 +29,16 @@ class ThumbnailPipeline(ImageSpec):
 class CreatePhotoThumbnailJPEG(Service):
     path = forms.CharField()
 
-
-
     def process(self):
         filename, extension = os.path.splitext(self.cleaned_data['path'])
-
-        with open(f'{MEDIA_ROOT}/{filename}{extension}', 'rb') as src:
-            thumbnail = ThumbnailPipeline(source=src)
-            generated_img = thumbnail.generate()
-
-            with open(f'{MEDIA_ROOT}/{filename}_thumbnail.jpeg', 'wb') as dest:
-                dest.write(generated_img.read())
+        thumbnail_path = f'{MEDIA_ROOT}/{filename}_thumbnail.jpeg'
         
-        return super().process()
+        if not os.path.exists(thumbnail_path):
+            with open(f'{MEDIA_ROOT}/{filename}{extension}', 'rb') as src:
+                thumbnail = ThumbnailPipeline(source=src)
+                generated_img = thumbnail.generate()
+
+                with open(thumbnail_path, 'wb') as dest:
+                    dest.write(generated_img.read())
+            
+            return super().process()
