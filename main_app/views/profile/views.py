@@ -1,8 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.shortcuts import render
-from django.urls import reverse
+from django.shortcuts import render, redirect
 from django.views import View
 
 from models_app.admin.user_profile.forms import UserProfileForm
@@ -35,6 +33,6 @@ class ProfileView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile is updated successfully')
-            return HttpResponseRedirect(reverse('main_app:profile'))
+            return redirect('main_app:profile')
         
         return self.get(request, *args, **kwargs)

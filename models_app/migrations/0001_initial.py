@@ -4,7 +4,7 @@ import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.db.models.deletion
 import django.utils.timezone
-import models_app.models.img_upl
+import models_app.utils.img_save.utils
 from django.conf import settings
 from django.db import migrations, models
 
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=256)),
                 ('pub_date', models.DateTimeField(blank=True, default=None, null=True)),
                 ('status', models.CharField(max_length=16)),
-                ('img', models.ImageField(upload_to=models_app.models.img_upl.uploaded_file_path)),
+                ('img', models.ImageField(upload_to=models_app.utils.img_save.utils.uploaded_file_path)),
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
             options={

@@ -8,5 +8,7 @@ urlpatterns = [
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('upload/', views.UploadPhoto.as_view(), name='upload'),
     path('edit_photo/<int:id>', views.EditPhoto.as_view(), name='edit_photo'),
-    path('view_photo_versions/<int:id>', views.ViewPhotoVersions.as_view(), name='view_photo_versions')
+    path('view_photo_versions/<int:id>', views.ViewPhotoVersions.as_view(), name='view_photo_versions'),
+    path('delete_photo/<int:id>', views.DeletePhoto.as_view(), name='delete_photo'),
+    path('recover_photo/<int:id>', views.RecoverPhoto.as_view(), name='recover_photo'),
 ]

@@ -10,18 +10,27 @@
             <div class="card-body bg-body-tertiary">
                 <div class="card-title">
                     <h5>{{ph.title}}</h5>
-                    <span class="badge rounded-pill text-bg-primary">
-                        {% if ph.status %}
-                            {{ph.status}}
-                        {% else %}
-                            no status yet
-                        {% endif %}
+                    {% if ph.status == 'TBD' %}
+                    <span class="badge rounded-pill text-bg-warning">
+                    {% elif ph.status == 'OM'%}
+                    <span class="badge rounded-pill text-bg-dark"> 
+                    {% elif ph.status == 'APR'%}
+                    <span class="badge rounded-pill text-bg-success">
+                    {% elif ph.status == 'DEN'%}
+                    <span class="badge rounded-pill text-bg-danger">
+                    {% endif %}
+                        {{ph.get_status_display}}
                     </span>
                 </div>
                 <hr>
                 <p class="card-text">{{ph.description}}</p>
                 <a href="{% url 'main_app:view_photo_versions' ph.id %}" class="btn btn-primary">Versions</a>
                 <a href="{% url 'main_app:edit_photo' ph.id %}" class="btn btn-primary">Edit</a>
+                {% if ph.status == 'TBD' %}
+                    <a href="{% url 'main_app:recover_photo' ph.id %}" class="btn btn-warning">Recover</a>
+                {% else %}
+                    <a href="{% url 'main_app:delete_photo' ph.id %}" class="btn btn-danger">Delete</a>
+                {% endif %}
             </div>
           </div>
     </div>

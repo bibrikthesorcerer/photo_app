@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from main_app.services.mixins import AuthorRequiredMixin
+from main_app.utils.mixins.utils import AuthorRequiredMixin
 from main_app.services.photo.read import ReadPhotoByID
 from main_app.services.photo_version.read import ReadPhotoVersionsByPhotoID
 from models_app.models.photo.models import Photo

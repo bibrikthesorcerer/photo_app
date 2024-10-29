@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views import View
 
-from main_app.services.mixins import AuthorRequiredMixin
+from main_app.utils.mixins.utils import AuthorRequiredMixin
 from main_app.services.photo.process import CreatePhotoThumbnailJPEG
 from main_app.services.photo.read import ReadPhotoByID
 from main_app.services.photo_version.create import CreatePhotoVersion
@@ -26,7 +26,7 @@ class EditPhoto(LoginRequiredMixin,AuthorRequiredMixin, View):
         form = PhotoForm(request.POST, request.FILES, instance=photo_obj)
         
         if form.is_valid():
-            CreatePhotoVersion.execute({'photo_id': photo_obj.id})
+            CreatePhotoVersion.execute({'photo': photo_obj})
             photo_obj = form.save()
             CreatePhotoThumbnailJPEG.execute({'path': photo_obj.img})
             messages.success(request, 'Photo uploaded successfully')
