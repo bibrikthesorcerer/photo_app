@@ -1,5 +1,6 @@
 from django.forms import ModelForm
 from models_app.models import UserProfile
+
 class UserProfileForm(ModelForm):   
     class Meta:
         model = UserProfile
@@ -8,10 +9,8 @@ class UserProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-
         for _, elem in self.fields.items():
             elem.widget.attrs['class'] = 'form-control'
 
     def save(self, commit=True):
-        print(self.changed_data)
         self.user = super().save()  

@@ -1,2 +1,2 @@
-from .photo.read import *
-from .user_profile.read import *
+from .photo import *
+from .user_profile import *
