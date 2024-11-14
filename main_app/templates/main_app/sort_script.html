@@ -1,0 +1,31 @@
+<script>
+    sortGroup = document.getElementById('sortGroup');
+    sortGroup.addEventListener('click', function(event){
+        sortAJAX(event.target);
+    })
+    
+    function sortAJAX(elem){
+        var order = elem.getAttribute('data-value');
+        console.log(order);
+        $.ajax({
+            url:'/sort',
+            type:'GET',
+            data:{'order':order},
+            success: function(response){
+                console.log('SERVER RESPONDED:', response);
+                id_arr = response['photos'];
+                postsList = document.getElementById('postsList');
+                cards = [].slice.call(postsList.getElementsByClassName('card'));
+                cards.sort(function(a, b){
+                    var idA = parseInt(a.id);
+                    var idB = parseInt(b.id);
+                    return id_arr.indexOf(idA) - id_arr.indexOf(idB);
+                })
+                row = postsList.children[0];
+                cards.forEach(function(elem){
+                    row.appendChild(elem.parentNode);
+                })
+            }
+        })
+    }
+</script>

@@ -11,4 +11,6 @@ urlpatterns = [
     path('view_photo_versions/<int:id>', views.ViewPhotoVersions.as_view(), name='view_photo_versions'),
     path('delete_photo/<int:id>', views.DeletePhoto.as_view(), name='delete_photo'),
     path('recover_photo/<int:id>', views.RecoverPhoto.as_view(), name='recover_photo'),
+    path('search', views.SearchView.as_view(), name='search'),
+    path('sort', views.SortView.as_view(), name='sort')
 ]

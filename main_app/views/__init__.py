@@ -5,3 +5,5 @@ from .edit_photo.views import EditPhoto
 from .view_versions.views import ViewPhotoVersions
 from .delete_photo.views import DeletePhoto
 from .recover_photo.views import RecoverPhoto
+from .search.views import SearchView
+from .sort.views import SortView
