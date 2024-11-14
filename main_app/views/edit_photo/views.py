@@ -16,17 +16,17 @@ class EditPhoto(LoginRequiredMixin,AuthorRequiredMixin, View):
     login_url='/login/github'
     template_name = 'main_app/edit_photo.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         photo_obj = ReadPhotoByID().execute({'photo_id': self.kwargs['id']})
         form = PhotoForm(instance=photo_obj)
         return render(request, self.template_name, {'form': form})
     
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         photo_obj = ReadPhotoByID().execute({'photo_id': self.kwargs['id']})
         form = PhotoForm(request.POST, request.FILES, instance=photo_obj)
         
         if form.is_valid():
-            CreatePhotoVersion.execute({'photo': photo_obj})
+            CreatePhotoVersion.execute({'photo_id': photo_obj.id})
             photo_obj = form.save()
             CreatePhotoThumbnailJPEG.execute({'path': photo_obj.img})
             messages.success(request, 'Photo uploaded successfully')
