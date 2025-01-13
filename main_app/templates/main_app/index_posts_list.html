@@ -32,11 +32,11 @@
             <p><strong>{{ph.title}}</strong><br>
               by {{ph.user.username}}<br>
               {% if user.is_authenticated and ph|is_liked:user %}
-              <span class="btn badge rounded-pill text-bg-danger" id="likesCount">{{ph.likes_count}}❤</span>
+                <span class="btn badge rounded-pill text-bg-danger like-button">{{ph.likes_count}}❤</span>
               {% else %}
-              <span class="btn badge rounded-pill text-bg-light" id="likesCount">{{ph.likes_count}}❤</span>
+                <span class="btn badge rounded-pill text-bg-light like-button">{{ph.likes_count}}❤</span>
               {% endif %}
-              <span class="btn badge rounded-pill text-bg-light" id="likesCount">{{ph.comments_count}}🗨️</span>
+              <span class="btn badge rounded-pill text-bg-light comment-button">{{ph.comments_count}}🗨️</span>
             </p>
           </div>
         </div>

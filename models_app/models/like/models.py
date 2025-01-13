@@ -8,3 +8,8 @@ class Like(MetaAbstract, SoftDelMixin):
 
     def __str__(self):
         return f'{self.user} on {self.photo}'
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['photo','user'], name='unique_photo_user')
+        ]

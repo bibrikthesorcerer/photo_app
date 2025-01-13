@@ -34,11 +34,19 @@ class ReadAllPhotosWithComments(Service):
             photos = ReadAllPhotos.execute({})
             return photos.annotate(comments_count=Count('comment'))
       
-class ReadAllPhotosWithLikesAndComments(Service):
+class ReadAllPhotosWithAllLikesAndComments(Service):
       
       def process(self) -> QuerySet:
             photos = ReadAllPhotos.execute({})
             return photos.annotate(likes_count=Count('like'), comments_count=Count('comment'))
+      
+class ReadAllPhotosWithLikesAndComments(Service):
+      
+      def process(self) -> QuerySet:
+            photos = ReadAllPhotos.execute({})
+            return photos.annotate(
+                  likes_count=Count('like', filter=Q(like__deleted_at=None)), 
+                  comments_count=Count('comment', filter=Q(comment__deleted_at=None)))
 
 class ReadAllPhotosWithUsers(Service):
 
@@ -62,7 +70,7 @@ class ReadPhotosIDWithEntry(Service):
             return photo_ids
 
 class ReadPhotosAndOrder(Service):
-      order = forms.CharField()
+      order = forms.ChoiceField()
 
       def process(self):
             order = self.cleaned_data['order']

@@ -1,0 +1,72 @@
+<script>
+    likeButtons = document.getElementsByClassName('like-button');
+    likeButtonsArray = [...likeButtons];
+
+    likeButtonsArray.forEach((elem) => {
+        elem.addEventListener('click', function(event){
+            likeAJAX(event.target)
+        }
+        );
+    })
+
+    function likeAJAX(elem){
+        post_card = elem.closest('div.card');
+        photo_id = post_card.id;
+        if (elem.classList.contains('text-bg-light')){
+            createLikeAJAX(elem, photo_id);
+        }
+        else if(elem.classList.contains('text-bg-danger')){
+            removeLikeAJAX(elem, photo_id);
+        }
+    }
+
+    function createLikeAJAX(elem, photo_id){
+        $.ajax({
+                url:'/create_like',
+                type:'POST',
+                data:{
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'photo_id':photo_id
+                },
+                success: function(response){
+                    console.log('SERVER RESPONDED:', response);
+                    if(response.status == 'duplicate'){
+                        console.error('You have already liked this photo');
+                    }
+                    else{
+                        elem.classList.remove('text-bg-light');
+                        elem.classList.add('text-bg-danger');
+                        numOfLikes = parseInt(elem.innerHTML.split('❤')[0]);
+                        numOfLikes++;
+                        elem.innerHTML = '' + numOfLikes + '❤';
+                    }
+                },
+                error: function(xhr){
+                    console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+                }
+            });
+    }
+
+    function removeLikeAJAX(elem, photo_id){
+        $.ajax({
+                url:'/remove_like',
+                type:'POST',
+                data:{
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'photo_id':photo_id
+                },
+                success: function(response){
+                    console.log('SERVER RESPONDED:', response);
+                    elem.classList.remove('text-bg-danger');
+                    elem.classList.add('text-bg-light');
+                    numOfLikes = parseInt(elem.innerHTML.split('❤')[0]);
+                    numOfLikes--;
+                    elem.innerHTML = '' + numOfLikes + '❤';
+                },
+                error: function(xhr){
+                    console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+                }
+            });
+    }
+
+</script>
