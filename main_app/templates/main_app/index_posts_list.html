@@ -1,47 +1,72 @@
-{% load filters %}
 
-<div class="container justify-content-center" style="display: flex;">
-  <div class="input-group input-group-lg m-3" style="width: 800px;">
+<div class="container justify-content-center d-flex">
+  <div class="input-group input-group-lg m-3" style="width: 50vw;">
       <span class="input-group-text">🔎</span>
       <input id="searchBar" type="text" class="form-control" placeholder="Search posts by title, description or author" aria-label="Search">
-      <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Sort posts
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" id="sortGroup">
-        <li><a class="dropdown-item" id="sortLikesAsc" data-value="likes_count">⬆ by likes</a></li>
-        <li><a class="dropdown-item" id="sortLikesDesc" data-value="-likes_count">⬇ by likes</a></li>
-        <li><a class="dropdown-item" id="sortDateAsc" data-value="pub_date">⬆ by date</a></li>
-        <li><a class="dropdown-item" id="sortDateDesc" data-value="-pub_date">⬇ by date</a></li>
-        <li><a class="dropdown-item" id="sortCommentsAsc" data-value="comments_count">⬆ by comments</a></li>
-        <li><a class="dropdown-item" id="sortCommentsDesc" data-value="-comments_count">⬇ by comments</a></li>
-      </ul>
+      <select class="form-select" aria-label="Sort posts" aria-expanded="false" id="sortGroup" style="max-width: 14vw;">
+        <option selected value="">Default Sorting</option>
+        <option value="likes_count">⬆ by likes</option>
+        <option value="-likes_count">⬇ by likes</option>
+        <option value="pub_date">⬆ by date</option>
+        <option value="-pub_date">⬇ by date</option>
+        <option value="comments_count">⬆ by comments</option>
+        <option value="-comments_count">⬇ by comments</option>
+      </select>
   </div>
 </div>
 
-<div class="container text-center" id="postsList">
-    <div class="row row-cols-auto justify-content-center">
+{% if photos_page.has_other_pages %}
+  <nav id="paginationControls">
+    <ul class="pagination pagination-lg justify-content-center"> 
+      {% if photos_page.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1&{{params}}">&laquo;</a></li>
+      {% endif %}
+      
+      {% for pg in photos_page.paginator.page_range %}
+        {% if pg == photos_page.number %}
+          <li class="page-item active"><span class="page-link">{{ photos_page.number }}</span></li>
+        {% elif pg >= photos_page.number|add:-2 and pg <= photos_page.number|add:2 %}
+          <li class="page-item"><a class="page-link" href="?page={{ pg }}&{{params}}">{{ pg }}</a></li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if photos_page.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ photos_page.paginator.num_pages }}&{{params}}">&raquo;</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
 
-    {% for ph in photos %} 
-      <div class="col m-2">
-        <div class="card shadow-sm" title="{{ph.description}}" id="{{ph.id}}">
+<div class="container text-center" id="postsList">
+  <div class="row row-cols-auto justify-content-center">
+
+  {% for ph in photos_page %}
+    <div class="col m-2">
+      <div class="card" title="{{ph.description}}" id="{{ph.id}}">
+        <div style="transform: rotate(0);">
+          <a href="{% url 'main_app:view_photo' ph.id %}" class="stretched-link"></a>
           <div class="card-body bg-body-tertiary">
-            <img src="{{ph.img.url | get_thumbnail}}" alt="Post's image">
+            <img src="{{ph.img_thumbnail.url}}" alt="Post's image">
           </div>
-          
           <div class="card-text">
             <p><strong>{{ph.title}}</strong><br>
               by {{ph.user.username}}<br>
-              {% if user.is_authenticated and ph|is_liked:user %}
-                <span class="btn badge rounded-pill text-bg-danger like-button">{{ph.likes_count}}❤</span>
-              {% else %}
-                <span class="btn badge rounded-pill text-bg-light like-button">{{ph.likes_count}}❤</span>
-              {% endif %}
-              <span class="btn badge rounded-pill text-bg-light comment-button">{{ph.comments_count}}🗨️</span>
             </p>
           </div>
         </div>
+        <div class="card-footer">
+          {% if user.is_authenticated and ph.is_liked %}
+            <span class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
+          {% else %}
+            <span class="btn badge rounded-pill text-bg-light like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
+          {% endif %}
+          <span class="btn badge rounded-pill text-bg-light comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</span>
+        </div>
       </div>
-    {% endfor %}
-
     </div>
+  {% endfor %}
+
   </div>
+</div>
+
+

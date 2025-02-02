@@ -1,20 +1,17 @@
 from service_objects.services import Service
-from service_objects.fields import ModelField
-from pathlib import Path
-from shutil import rmtree
+from django import forms
 
 from models_app.models.photo.models import Photo
 
 class DeletePhotoByID(Service):
-    photo = ModelField(Photo)
+    photo_id = forms.IntegerField()
+
+    def _delete_img_files(self, objects):
+        for obj in objects:
+            obj.img.delete()
 
     def process(self):
-        photo_obj = self.cleaned_data['photo']
-
-        if photo_obj.status is Photo.TO_BE_DELETED:
-            photo_dir = Path(photo_obj.img.path)
-            result =  photo_obj.delete()
-            rmtree(photo_dir.parents[1])
-            return result
-        else:
-            return False
+        photo_id = self.cleaned_data['photo_id']
+        photos = Photo.objects.filter(id=photo_id, status=Photo.TO_BE_DELETED)
+        self._delete_img_files(photos)
+        return photos.delete()
