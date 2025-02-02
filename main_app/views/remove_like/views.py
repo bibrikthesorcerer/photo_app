@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.forms.models import model_to_dict
 
-from main_app.services.like.update import SoftDeleteLike
+from main_app.services.like import SoftDeleteLike
 
 class RemoveLike(LoginRequiredMixin, View):
     login_url='/login/github'

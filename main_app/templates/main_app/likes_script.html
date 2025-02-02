@@ -4,14 +4,13 @@
 
     likeButtonsArray.forEach((elem) => {
         elem.addEventListener('click', function(event){
-            likeAJAX(event.target)
+            likeAJAX(elem)
         }
         );
     })
 
     function likeAJAX(elem){
-        post_card = elem.closest('div.card');
-        photo_id = post_card.id;
+        photo_id = elem.getAttribute('data-photo-id')
         if (elem.classList.contains('text-bg-light')){
             createLikeAJAX(elem, photo_id);
         }
@@ -36,9 +35,9 @@
                     else{
                         elem.classList.remove('text-bg-light');
                         elem.classList.add('text-bg-danger');
-                        numOfLikes = parseInt(elem.innerHTML.split('❤')[0]);
+                        numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
                         numOfLikes++;
-                        elem.innerHTML = '' + numOfLikes + '❤';
+                        elem.innerHTML = '' + numOfLikes + ' ❤';
                     }
                 },
                 error: function(xhr){
@@ -59,9 +58,9 @@
                     console.log('SERVER RESPONDED:', response);
                     elem.classList.remove('text-bg-danger');
                     elem.classList.add('text-bg-light');
-                    numOfLikes = parseInt(elem.innerHTML.split('❤')[0]);
+                    numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
                     numOfLikes--;
-                    elem.innerHTML = '' + numOfLikes + '❤';
+                    elem.innerHTML = '' + numOfLikes + ' ❤';
                 },
                 error: function(xhr){
                     console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
