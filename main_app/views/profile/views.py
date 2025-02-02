@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from models_app.admin.user_profile.forms import UserProfileForm
-from ...services import ReadPhotoByUserID, ReadUserGithubPFP
+from ...services import ReadPhotos, ReadUserGithubPFP
 
 
 class ProfileView(LoginRequiredMixin, View):
@@ -14,15 +14,17 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         context = {}
 
-        photos = ReadPhotoByUserID.execute({
-            'user_id' : self.request.user.id
+        photos = ReadPhotos().execute({
+            "filter": {
+                'user' : self.request.user,
+            }
         })
 
-        avatar_url = ReadUserGithubPFP.execute({
+        avatar_url = ReadUserGithubPFP().execute({
             'user_id' : self.request.user.id
         })
-
-        context['photos'] = photos
+        page = request.GET.get('page', 1)
+        context['photos_page'] = photos.get_page(page)
         context['avatar'] = avatar_url
         context['form'] = UserProfileForm(instance=self.request.user)
 

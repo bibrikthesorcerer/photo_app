@@ -1,0 +1,69 @@
+{% extends 'main_app/base.html' %}
+
+{% block head %}
+<title>View Photo | PhotoApp</title>
+{% endblock %}
+
+{% block body %}
+<div class="mt-3 d-flex align-items-center justify-content-center">
+    <div class="card shadow-sm">
+        <div id="postContainer" style="width: 90vw;">
+            <div id="authorAvatar" class="m-3">
+                <img src="https://avatars.githubusercontent.com/u/{{photo.user.social_auth.first.extra_data.id}}"
+                alt="PFP" style="border-radius: 50%; height: 40px; width: 40px;" class="mx-2">
+                <b>{{ photo.user.username }}</b>            
+            </div>
+            <div class="bg-body-tertiary">
+                <img src="{{ photo.img.url}}" class="mx-auto d-block" style="max-height: 70vh; max-width: 90vw;">
+            </div>
+            <div class="card-body">
+                <h1 class="card-title" style="word-break: break-all;">{{ photo.title }}</h1>
+                <p class="text-muted" style="display:inline;">Published {{ photo.pub_date|date:"M d, Y" }}</p>
+                <br>
+                <p class="card-text">
+                    <h5>{{ photo.description }}</h5>
+                </p>
+                    <hr>
+                    <div style="font-size: 2em;">
+                        {% if request.user.is_authenticated and photo.is_liked %}
+                            <span class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{photo.id}}">{{photo.likes_count}} ❤</span>
+                        {% else %}
+                            <span class="btn badge rounded-pill text-bg-light like-button" data-photo-id="{{photo.id}}">{{photo.likes_count}} ❤</span>
+                        {% endif %}
+                            <span class="btn badge rounded-pill text-bg-light comment-button" data-photo-id="{{photo.id}}">{{photo.comments_count}} 🗨️</span>
+                    </div>
+                </p>
+                <br>
+                {% if photo.comments_count != 0 %}
+                    <h3>Comments:</h3>
+                    {% for comm in comments %}
+                        <div id="comm{{ comm.id }}" class="my-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <b>{{ comm.user.username }}</b> on {{ comm.pub_date|date:"d/m/Y H:i:s" }}
+                                </div>
+                                <div class="card-body">
+                                    <h5>{{ comm.text }}</h5>
+                                </div>
+                                <div class="m-2 bg-body-primary">
+                                    <span class="btn badge rounded-pill text-bg-light reply-button"><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="32px" fill="#5f6368"><path d="M760-200v-160q0-50-35-85t-85-35H273l144 144-57 56-240-240 240-240 57 56-144 144h367q83 0 141.5 58.5T840-360v160h-80Z"/></svg></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!---Recursive children output-->
+                        {% include 'main_app/child_comments.html' with comm=comm indent=1 %}
+                    {% endfor %}
+                {% else %}
+                    <h3>Be first to leave a comment!</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{% include 'main_app/likes_script.html' %}
+
+{% endblock %}

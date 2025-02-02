@@ -1,9 +1,7 @@
 {% extends 'main_app/base.html' %}
 
-{% load filters %}
-
 {% block head %}
-<title>View Photo | PhotoApp</title>
+<title>View Photo Versions | PhotoApp</title>
 {% endblock %}
 
 {% block body %}
@@ -45,7 +43,7 @@
                         <p class="text-muted mb-0">Created on: {{ version.created_at|date:"M d, Y H:i:s" }}</p>
                     </div>
                     <div class="card-body">
-                        <img src="{{ version.img.url | get_thumbnail }}" alt="Version Image" class="img-fluid mb-3" height="300" width="300">
+                        <img src="{{ version.img_thumbnail.url}}" alt="Version Image" class="img-fluid mb-3" height="300" width="300">
                         <h5 class="card-title" style="word-break: break-word;">{{ version.title }}</h5>
                         <hr>
                         <p class="card-text">

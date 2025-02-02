@@ -1,12 +1,12 @@
 {% load static %}
-{% load filters %}
 
 <h3>Posts:</h3>
+{% include 'main_app/pagination.html' %}
 <div class="row row-cols-auto">
-{% for ph in photos %}
+{% for ph in photos_page %}
     <div class="col">
         <div class="card shadow-sm" style="width: 18rem;">
-            <img src="{{ ph.img.url  | get_thumbnail}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
+            <img src="{{ ph.img_thumbnail.url}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
             <div class="card-body bg-body-tertiary">
                 <div class="card-title">
                     <h5>{{ph.title}}</h5>
