@@ -27,8 +27,8 @@
             </div>
             <hr>
             <!-- List of Posts -->
-            {% if photos|length %}
-                {% include 'main_app/profile_posts_list.html' %}
+            {% if photos_page.paginator.count %}
+              {% include 'main_app/profile_posts_list.html' %}
             {% else %}
                 <h3>You've made no posts yet</h3>
             {% endif %}

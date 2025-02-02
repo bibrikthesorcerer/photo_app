@@ -1,10 +1,13 @@
 from django.contrib import admin
+from imagekit.admin import AdminThumbnail
+
 from ...models import PhotoVersion
 
 @admin.register(PhotoVersion)
 class PhotoVersionAdmin(admin.ModelAdmin):
     list_display = ['title', 'photo_id', 'author', 'status']
     search_fields = ['title', 'author', 'status', 'description']
+    admin_thumbnail = AdminThumbnail(image_field='admin_thumbnail')
 
     @admin.display(description="Author")
     def author(self, obj):

@@ -1,8 +1,8 @@
 from django.db import models
-from ..meta_abstract.models import MetaAbstract
-from ..soft_del_mixin.models import SoftDelMixin
 
-class Like(MetaAbstract, SoftDelMixin):
+from models_app.models.base_model import BaseModel, SoftDelMixin
+
+class Like(BaseModel, SoftDelMixin):
     photo = models.ForeignKey('models_app.Photo', on_delete=models.CASCADE)
     user = models.ForeignKey('models_app.UserProfile', on_delete=models.CASCADE)
 
@@ -13,3 +13,6 @@ class Like(MetaAbstract, SoftDelMixin):
         constraints = [
             models.UniqueConstraint(fields=['photo','user'], name='unique_photo_user')
         ]
+        verbose_name = "like"
+        verbose_name_plural = "likes"
+        db_table = "likes"
