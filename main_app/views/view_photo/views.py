@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.db.models import Count, Q
 
-from main_app.services.comment.read import ReadComments
+#from main_app.services.comment.read import ReadComments
 from main_app.services.photo.read import ReadPhotos
 
 class ViewPhoto(View):
@@ -17,14 +17,14 @@ class ViewPhoto(View):
             "user": user,
             "pk": kwargs["id"],
         })
-        comments = ReadComments.execute({
-            "filter":{
-                "photo": photo_obj.id,
-                "parent__isnull": True,
-            }
-        })
+        # comments = ReadComments.execute({
+        #     "filter":{
+        #         "photo": photo_obj.id,
+        #         "parent__isnull": True,
+        #     }
+        # })
         context = {
             "photo": photo_obj,
-            "comments": comments,
+            #"comments": comments,
         }
         return render(request, self.template_name, context)

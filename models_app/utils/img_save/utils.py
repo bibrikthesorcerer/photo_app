@@ -1,9 +1,22 @@
 import inspect
 import re
+import pathlib
+import shutil
 
 from django.core.files import File
 from django.db import models
 from django.db.models.fields.files import FieldFile
+from django.core.files.storage import default_storage
+
+def delete_photo_file(sender, instance, **kwargs):
+    if instance.img:
+        file_path = instance.img.path
+        parent_dir = pathlib.Path(file_path).parents[1]
+        if file_path and default_storage.exists(parent_dir):
+            try:
+                shutil.rmtree(default_storage.path(parent_dir))
+            except OSError as e:
+                print(f"Error deleting photo directory: {e.strerror}")
 
 def uploaded_file_path(instance: models.Model, filename: str) -> str:
     path = re.sub(r"(\d.+)(\d{3})(\d{3})$", r"\1/\2/\3", f"{instance.id:09d}")
