@@ -1,0 +1,18 @@
+{% for child in comm.children.all %}
+    <div class="row row-cols-12">
+        <div class="col-{{indent}}"></div>
+        <div id="comm{{ child.id }}" class="my-2 col">
+            <div class="card">
+                <div class="card-header">
+                    <b>{{ child.user.username }}</b> on {{ child.pub_date|date:"d/m/Y H:i:s" }}
+                </div>
+                <div class="card-body">
+                    <h5>{{ child.text }}</h5>
+                </div>
+                <div class="m-2 bg-body-primary">
+                    <a class="btn badge rounded-pill text-bg-primary reply-button"><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="32px" fill="#ffffff"><path d="M760-200v-160q0-50-35-85t-85-35H273l144 144-57 56-240-240 240-240 57 56-144 144h367q83 0 141.5 58.5T840-360v160h-80Z"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

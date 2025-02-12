@@ -8,3 +8,6 @@ from .recover_photo.views import RecoverPhoto
 from .create_like.views import CreateLike
 from .remove_like.views import RemoveLike
 from .view_photo.views import ViewPhoto
+from .view_thread.views import ViewThread
+from .leave_comment import *
+from .delete_comment import *

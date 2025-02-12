@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block body %}
+
+{% include 'main_app/comment_modal.html' %}
+
 <div class="mt-3 d-flex align-items-center justify-content-center">
     <div class="card shadow-sm">
         <div id="postContainer" style="width: 90vw;">
@@ -26,33 +29,26 @@
                     <hr>
                     <div style="font-size: 2em;">
                         {% if request.user.is_authenticated and photo.is_liked %}
-                            <span class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{photo.id}}">{{photo.likes_count}} ❤</span>
+                            <span id="likesCount" class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{photo.id}}">
+                                {{photo.likes_count}} ❤
+                            </span>
                         {% else %}
-                            <span class="btn badge rounded-pill text-bg-light like-button" data-photo-id="{{photo.id}}">{{photo.likes_count}} ❤</span>
+                            <span id="likesCount" class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{photo.id}}">
+                                {{photo.likes_count}} ❤
+                            </span>
                         {% endif %}
-                            <span class="btn badge rounded-pill text-bg-light comment-button" data-photo-id="{{photo.id}}">{{photo.comments_count}} 🗨️</span>
+                            <span id="commentsCount" data-bs-toggle="modal" data-bs-target="#commentModal" 
+                            class="btn badge rounded-pill text-bg-primary comment-button" 
+                            data-photo-id="{{photo.id}}"
+                            data-id="">{{photo.comments_count}} 🗨️</span>
                     </div>
                 </p>
                 <br>
                 {% if photo.comments_count != 0 %}
                     <h3>Comments:</h3>
-                    {% for comm in comments %}
-                        <div id="comm{{ comm.id }}" class="my-2">
-                            <div class="card">
-                                <div class="card-header">
-                                    <b>{{ comm.user.username }}</b> on {{ comm.pub_date|date:"d/m/Y H:i:s" }}
-                                </div>
-                                <div class="card-body">
-                                    <h5>{{ comm.text }}</h5>
-                                </div>
-                                <div class="m-2 bg-body-primary">
-                                    <span class="btn badge rounded-pill text-bg-light reply-button"><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="32px" fill="#5f6368"><path d="M760-200v-160q0-50-35-85t-85-35H273l144 144-57 56-240-240 240-240 57 56-144 144h367q83 0 141.5 58.5T840-360v160h-80Z"/></svg></a>
-                                </div>
-                            </div>
-                        </div>
-                        <!---Recursive children output-->
-                        {% include 'main_app/child_comments.html' with comm=comm indent=1 %}
-                    {% endfor %}
+                    <div class="comment-list">
+                        {% include 'main_app/comments_section.html' %}
+                    </div>
                 {% else %}
                     <h3>Be first to leave a comment!</h3>
                 {% endif %}
@@ -65,5 +61,6 @@
 {% block scripts %}
 
 {% include 'main_app/likes_script.html' %}
+{% include 'main_app/comment_script.html' %}
 
 {% endblock %}

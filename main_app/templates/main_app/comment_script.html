@@ -1,0 +1,149 @@
+<div aria-live="polite" aria-atomic="true" class="toast-container m-3" style="position: sticky; bottom: 0px; float: right;">
+    <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+            <strong class="me-auto">PhotoApp</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body fs-5">
+            Your comment was added!<br>
+            You might check it out in a dedicated thread <a id="toastLink" href="">here</a>
+        </div>
+    </div>
+</div>
+<script>
+
+    function ChangeCommentsCount(change_value){
+        commentsStr = $('#commentsCount').html();
+        if (commentsStr){
+            regex = new RegExp('\\d+');
+            commentsCount = parseInt(commentsStr.match(regex));
+            $('#commentsCount').html(`${commentsCount+change_value} 🗨️`);
+        }
+    }
+
+    function DeleteCommentAjax(event, delButton) {
+        commentId = $(delButton).data('id');
+        element = $(delButton)
+        $.ajax({
+            url: `/delete_comment/${commentId}`,
+            type: 'GET',
+            success: function(response) {
+                console.log('SERVER RESPONDED:', response);
+                $(element).closest('.comment-container').remove();
+                ChangeCommentsCount(-1);
+            },
+            error: function(xhr) {
+                console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+            }
+        });
+    }
+
+    $('.delete-comment-button').each(function() {
+        $(this).on('click', function(event){
+            delButton = $(this);
+            DeleteCommentAjax(event, delButton);
+        });
+    });
+
+    function formatDate(dateString) {
+        date = new Date(dateString);
+
+        day = String(date.getDate()).padStart(2, '0');
+        month = String(date.getMonth() + 1).padStart(2, '0'); // month start from 0
+        year = date.getFullYear();
+
+        hours = String(date.getHours()).padStart(2, '0');
+        minutes = String(date.getMinutes()).padStart(2, '0');
+        seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function GetCommentTemplate(indent, comm){
+        htmltemplate = `<div class="comment-container mb-5" id="comm${comm.id}">
+        <div class="row row-cols-12">
+        <div class="col-${indent}" id="indent{{comm.id}}" data-indent="{{indent}}"></div>
+        <div id="comm${comm.id}" class="my-2 col">
+            <div class="card">
+                <div class="card-header">
+                    <b>${comm.user}</b> on ${formatDate(comm.pub_date)}
+                </div>
+                <div class="card-body">
+                    <h5>${comm.text}</h5>
+                </div>
+                <div class="m-2 bg-body-primary">
+                    <a data-bs-toggle="modal" data-bs-target="#commentModal" 
+                    class="btn badge rounded-pill text-bg-primary comment-button"
+                    data-id="${comm.id}"
+                    data-photo-id="${comm.photo_id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="32px" fill="#ffffff">
+                            <path d="M760-200v-160q0-50-35-85t-85-35H273l144 144-57 56-240-240 240-240 57 56-144 144h367q83 0 141.5 58.5T840-360v160h-80Z"/>
+                        </svg>
+                    </a>
+                    <a data-id="${comm.id}" class="btn badge rounded-pill text-bg-danger delete-comment-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="32px" fill="#ffffff">
+                            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="comment-children"></div>
+        </div>`;
+        return htmltemplate;
+    }
+
+    function LeaveCommentAjax(event){
+        photoId = $('#photoInput').val();
+        parentId = $('#parentInput').val();
+        textMessage = $('#textInput').val();
+        $.ajax({
+            data:{
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                photo: photoId,
+                parent: parentId,
+                text: textMessage,
+            },
+            url: '/leave_comment/',
+            type: 'POST',
+            success: function(response) {
+                console.log('SERVER RESPONDED:', response);
+                if (parentId == ""){
+                    // add root comment to DOM
+                    commentTemplate = $(GetCommentTemplate(0, response));
+                    delButton = $(commentTemplate).find('.delete-comment-button:first');
+                    $(delButton).on('click', DeleteCommentAjax(event));
+                    $('.comment-list').prepend(commentTemplate);
+                }
+                else{
+                    // add reply to parent, according to indent
+                    parentComment = $(`#comm${parentId}`);
+                    indent = $(parentComment).find(`#indent${parentId}`).data('indent');
+                    if(indent < 5){
+                        commentTemplate = $(GetCommentTemplate(indent+1, response));
+                        delButton = $(commentTemplate).find('.delete-comment-button:first');
+                        $(delButton).on('click', DeleteCommentAjax(event));
+                        childrenList = $(parentComment).find('.comment-children:first');
+                        $(childrenList).append(commentTemplate);
+                    }
+                    else{
+                        $('#toastLink').attr('href', `/view_thread/${parentId}`);
+                        $('.toast').toast('show');
+                    }
+                }
+                $('#commentModal').modal('hide');
+                ChangeCommentsCount(1);
+            },
+            error: function(xhr) {
+                console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+            }
+        })
+    };
+
+    $('#commentModalSave').each(function(){
+        $(this).on('click', function(event){
+            LeaveCommentAjax(event)
+        });
+    });
+</script>

@@ -1,0 +1,22 @@
+{% for comm in comments %}
+<div class="comment-container mb-5" id="comm{{comm.id}}">
+     
+    {% include 'main_app/comment_snippet.html' with comm=comm indent=0 %}
+    {% with children=comm.children.all %}
+    <div class="comment-children">
+        {% for child in children %}
+        <div class="comment-container mb-5" id="comm{{child.id}}">
+            {% include 'main_app/comment_snippet.html' with comm=child indent=1 %}
+            <div class="comment-children"></div>
+        </div>
+        {% endfor %}
+    </div>
+        {% if children %}
+        <div class="m-2">
+            <a class="btn btn-primary" href="{% url 'main_app:view_thread' comm.id %}">View Full Thread</a>
+            <hr>
+        </div>
+        {% endif %}
+    {% endwith %}
+</div>
+{% endfor %}

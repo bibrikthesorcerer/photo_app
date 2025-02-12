@@ -1,0 +1,27 @@
+{# print given comment with given indent #}
+<div class="comment-container mb-5" id="comm{{comm.id}}">
+{% include 'main_app/comment_snippet.html' with comm=comm indent=indent %}
+
+{# each children is represented as a dict {comment: list of children as dicts } #}
+{# so we iterate over each child, unpacking a dict and recursevily print it #}
+<div class="comment-children">
+{% for child_dict in children %}
+    {% for child, ancestors in child_dict.items %}
+        
+        {# here if child_dict is not empty, we print either redirect button or next level of thread_section #}
+        
+        {% if indent >= max_depth %}
+        <div class="row row-cols-12">
+            <div class="col-{{indent}}"></div>
+                <div class="m-2 col">
+                    <a class="btn btn-primary" href="{% url 'main_app:view_thread' comm.id %}">View Full Thread</a>
+                    <hr>
+                </div>
+        </div>
+        {% else %}
+            {% include 'main_app/thread_section.html' with comm=child children=ancestors indent=indent|add:1 %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+</div>
+</div>

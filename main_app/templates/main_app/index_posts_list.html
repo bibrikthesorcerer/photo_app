@@ -58,9 +58,9 @@
           {% if user.is_authenticated and ph.is_liked %}
             <span class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
           {% else %}
-            <span class="btn badge rounded-pill text-bg-light like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
+            <span class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
           {% endif %}
-          <span class="btn badge rounded-pill text-bg-light comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</span>
+          <span class="btn badge rounded-pill text-bg-primary comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</span>
         </div>
       </div>
     </div>
