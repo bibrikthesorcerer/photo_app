@@ -13,5 +13,5 @@ class RemoveLike(LoginRequiredMixin, View):
             'photo_id': request.POST['photo_id'], 
             'user_id': request.user.id
             })
-        data = model_to_dict(like_obj)
-        return JsonResponse(data)
+        
+        return JsonResponse(model_to_dict(like_obj))
