@@ -7,6 +7,6 @@ class AuthorRequiredMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user != self.model.objects.get(pk=kwargs['id']).user:
-            messages.info(request, "Only post's author can edit post.")
+            messages.info(request, "You have no permission to edit this object.")
             return redirect('main_app:index')
         return super().dispatch(request, *args, **kwargs)

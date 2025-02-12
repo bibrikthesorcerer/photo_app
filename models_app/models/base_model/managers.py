@@ -6,6 +6,10 @@ class SoftDelQuerySet(models.QuerySet):
         deleted_ts = now()
         self.update(deleted_at=deleted_ts)
         return self
+    
+    def recover(self):
+        self.update(deleted_at=None)
+        return self
 
 class SoftDelManager(models.Manager):
     def get_queryset(self):
