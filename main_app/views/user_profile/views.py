@@ -4,29 +4,28 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from models_app.admin.user_profile.forms import UserProfileForm
-from ...services import ReadPhotos, ReadUserGithubPFP
+from main_app.services import ListPhotos, GetUserGithubPFP
 
 
-class ProfileView(LoginRequiredMixin, View):
+class UserProfileView(LoginRequiredMixin, View):
     login_url='/login/github'
     template_name = 'main_app/profile.html'
 
     def get(self, request, *args, **kwargs):
-        context = {}
-
-        photos = ReadPhotos().execute({
-            "filter": {
-                'user' : self.request.user,
-            }
+        photos = ListPhotos().execute({
+            **(request.GET.dict() | {"author": request.user})
         })
 
-        avatar_url = ReadUserGithubPFP().execute({
-            'user_id' : self.request.user.id
+        avatar_url = GetUserGithubPFP().execute({
+            "user" : request.user
         })
-        page = request.GET.get('page', 1)
-        context['photos_page'] = photos.get_page(page)
-        context['avatar'] = avatar_url
-        context['form'] = UserProfileForm(instance=self.request.user)
+
+        context = {
+            'params': f'per_page={photos.paginator.per_page}',
+            'photos_page': photos,
+            'avatar' : avatar_url,
+            'form': UserProfileForm(instance=request.user),
+        }
 
         return render(request, self.template_name, context)
     
