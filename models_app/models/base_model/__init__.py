@@ -1,1 +1,2 @@
-from .models import BaseModel, SoftDelMixin
+from .models import BaseModel
+from .models import SoftDelMixin
