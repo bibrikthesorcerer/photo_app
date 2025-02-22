@@ -1,5 +1,6 @@
 from django.forms import ModelForm
-from models_app.models.photo_version.models import PhotoVersion
+
+from models_app.models import PhotoVersion
 
 class PhotoVersionForm(ModelForm):
     
@@ -8,4 +9,4 @@ class PhotoVersionForm(ModelForm):
 
     class Meta:
         model = PhotoVersion
-        fields = ('title', 'description', 'pub_date', 'status', 'img')
+        fields = ('title', 'description', 'img')

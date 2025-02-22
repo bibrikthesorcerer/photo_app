@@ -21,6 +21,9 @@ psycopg2 = "^2.9.9"
 social-auth-app-django = "^5.4.2"
 redis = "^5.2.1"
 django-service-objects = {git = "https://git.snpdev.ru/saltpepper/django-service-objects.git"}
+django-extensions = "^3.2.3"
+pyparsing = "^3.2.1"
+pydot = "^3.0.4"
 
 
 [build-system]

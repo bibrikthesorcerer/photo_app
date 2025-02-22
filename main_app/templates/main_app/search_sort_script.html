@@ -1,17 +1,17 @@
 <script>
-    params = new URLSearchParams(window.location.search);
+    // params = new URLSearchParams(window.location.search);
     
-    entry = params.get('entry');
-    if (entry != null){
-        searchBar = document.getElementById('searchBar');
-        searchBar.value = entry;
-    }
+    // entry = params.get('entry');
+    // if (entry != null){
+    //     searchBar = document.getElementById('searchBar');
+    //     searchBar.value = entry;
+    // }
 
-    order = params.get('order');
-    if (order != null){
-        sortGroup = document.getElementById('sortGroup');
-        sortGroup.value = order;
-    }
+    // order = params.get('order');
+    // if (order != null){
+    //     sortGroup = document.getElementById('sortGroup');
+    //     sortGroup.value = order;
+    // }
 
     
     function SwapPosts(photos){
@@ -22,7 +22,7 @@
                 likes = `text-bg-danger`;
             }
             else{
-                likes =`text-bg-light`
+                likes =`text-bg-primary`
             }
             htmlStr +=`
             <div class="col m-2">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="card-footer">
                     <span class="btn badge rounded-pill ${likes} like-button" data-photo-id="${ph.id}">${ph.likes_count} ❤</span>
-                    <span class="btn badge rounded-pill text-bg-light comment-button" data-photo-id="${ph.id}">${ph.comments_count} 🗨️</span>
+                    <span class="btn badge rounded-pill text-bg-primary comment-button" data-photo-id="${ph.id}">${ph.comments_count} 🗨️</span>
                     </div>
                 </div>
             </div>`
@@ -50,6 +50,7 @@
     }
 
     function CorrectPagination(response, order, entry, page_size){
+        params = `per_page=${page_size}&order=${order}&entry=${entry}`
         total_pages = response.total_pages;
         nav = document.getElementById('paginationControls');
         htmlStr = '<ul class="pagination pagination-lg justify-content-center">';
@@ -90,6 +91,7 @@
         order = document.getElementById('sortGroup').value;
         params = new URLSearchParams(window.location.search);
         per_page = params.get('per_page');
+
         data = {'order': order, 'entry': entry}
         if (per_page != null){
             data['per_page'] = per_page
@@ -100,8 +102,8 @@
                 data:data,
                 success: function(response){
                     console.log('SERVER RESPONDED:', response);
-                    newURL = window.location.origin + window.location.pathname + "?" + response['params'];
-                    history.replaceState(null, '', newURL);
+                    // newURL = window.location.origin + window.location.pathname + "?" + response['params'];
+                    // history.replaceState(null, '', newURL);
                     photos = response['photos_page'];
                     SwapPosts(photos);
                     CorrectPagination(response, order, entry, per_page);

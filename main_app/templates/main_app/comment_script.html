@@ -25,12 +25,22 @@
         commentId = $(delButton).data('id');
         element = $(delButton)
         $.ajax({
-            url: `/delete_comment/${commentId}`,
-            type: 'GET',
+            data:{
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                comment_id: commentId,
+            },
+            url: `/delete_comment/`,
+            type: 'POST',
             success: function(response) {
                 console.log('SERVER RESPONDED:', response);
-                $(element).closest('.comment-container').remove();
-                ChangeCommentsCount(-1);
+                if (response['is_deleted']){
+                    $(element).closest('.comment-container').remove();
+                    ChangeCommentsCount(-1);
+                }
+                else{
+                    commText = $(element).closest('.comment-container').find('.card-body:first')
+                    $(commText).html(`<h5>${response['text']}</h5>`)
+                }
             },
             error: function(xhr) {
                 console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
@@ -101,8 +111,8 @@
         $.ajax({
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
-                photo: photoId,
-                parent: parentId,
+                photo_id: photoId,
+                parent_id: parentId,
                 text: textMessage,
             },
             url: '/leave_comment/',
@@ -113,7 +123,9 @@
                     // add root comment to DOM
                     commentTemplate = $(GetCommentTemplate(0, response));
                     delButton = $(commentTemplate).find('.delete-comment-button:first');
-                    $(delButton).on('click', DeleteCommentAjax(event));
+                    $(delButton).on('click', function(event){
+                        DeleteCommentAjax(event, delButton);
+                    });
                     $('.comment-list').prepend(commentTemplate);
                 }
                 else{
@@ -123,7 +135,9 @@
                     if(indent < 5){
                         commentTemplate = $(GetCommentTemplate(indent+1, response));
                         delButton = $(commentTemplate).find('.delete-comment-button:first');
-                        $(delButton).on('click', DeleteCommentAjax(event));
+                        $(delButton).on('click', function(event){
+                            DeleteCommentAjax(event, delButton);
+                        });
                         childrenList = $(parentComment).find('.comment-children:first');
                         $(childrenList).append(commentTemplate);
                     }
@@ -146,4 +160,5 @@
             LeaveCommentAjax(event)
         });
     });
+
 </script>

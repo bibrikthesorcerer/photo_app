@@ -21,7 +21,7 @@
 
     function createLikeAJAX(elem, photo_id){
         $.ajax({
-                url:'/create_like',
+                url:'/create_like/',
                 type:'POST',
                 data:{
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
@@ -48,7 +48,7 @@
 
     function removeLikeAJAX(elem, photo_id){
         $.ajax({
-                url:'/remove_like',
+                url:'/remove_like/',
                 type:'POST',
                 data:{
                     'csrfmiddlewaretoken': '{{ csrf_token }}',

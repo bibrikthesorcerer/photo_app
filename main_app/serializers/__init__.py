@@ -1,1 +1,2 @@
-from . import *
+from .comment import *
+from .photo import *

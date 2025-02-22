@@ -1,38 +1,40 @@
 {% load static %}
 
-<h3>Posts:</h3>
 {% include 'main_app/pagination.html' %}
-<div class="row row-cols-auto">
+<div class="row row-cols-auto justify-content-center">
 {% for ph in photos_page %}
     <div class="col">
         <div class="card shadow-sm" style="width: 18rem;">
-            <img src="{{ ph.img_thumbnail.url}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
             <div class="card-body bg-body-tertiary">
-                <div class="card-title">
-                    <h5>{{ph.title}}</h5>
-                    {% if ph.status == 'TBD' %}
-                    <span class="badge rounded-pill text-bg-warning">
-                    {% elif ph.status == 'OM'%}
-                    <span class="badge rounded-pill text-bg-dark"> 
-                    {% elif ph.status == 'APR'%}
-                    <span class="badge rounded-pill text-bg-success">
-                    {% elif ph.status == 'DEN'%}
-                    <span class="badge rounded-pill text-bg-danger">
-                    {% endif %}
-                        {{ph.get_status_display}}
-                    </span>
+                <div style="transform: rotate(0);">
+                    <a href="{% url 'main_app:view_photo' ph.id %}" class="stretched-link"></a>
+                    <img src="{{ ph.img_thumbnail.url}}" class="card-img-top object-fit-cover" alt="Post's image" height="200" width="300">
+                    <div class="card-title">
+                        <h5>{{ph.title}}</h5>
+                        {% if ph.status == 'TBD' %}
+                        <span class="badge rounded-pill text-bg-warning">
+                        {% elif ph.status == 'OM'%}
+                        <span class="badge rounded-pill text-bg-dark"> 
+                        {% elif ph.status == 'APR'%}
+                        <span class="badge rounded-pill text-bg-success">
+                        {% elif ph.status == 'DEN'%}
+                        <span class="badge rounded-pill text-bg-danger">
+                        {% endif %}
+                            {{ph.get_status_display}}
+                        </span>
+                    </div>
                 </div>
                 <hr>
                 <p class="card-text">{{ph.description}}</p>
                 <a href="{% url 'main_app:view_photo_versions' ph.id %}" class="btn btn-primary">Versions</a>
                 <a href="{% url 'main_app:edit_photo' ph.id %}" class="btn btn-primary">Edit</a>
-                {% if ph.status == 'TBD' %}
+                {% if ph.status == ph.TO_BE_DELETED %}
                     <a href="{% url 'main_app:recover_photo' ph.id %}" class="btn btn-warning">Recover</a>
                 {% else %}
                     <a href="{% url 'main_app:delete_photo' ph.id %}" class="btn btn-danger">Delete</a>
                 {% endif %}
             </div>
-          </div>
+        </div>
     </div>
 {% endfor %}
 </div>

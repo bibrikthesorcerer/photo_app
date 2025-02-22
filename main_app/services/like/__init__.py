@@ -1,3 +1,2 @@
-from .read import *
-from .delete import *
-from .update import *
+from .manage import UpdateOrCreateLike
+from .delete import DeleteLike

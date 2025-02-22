@@ -1,6 +1,7 @@
 from django.contrib import admin
-from ...models import UserProfile
+
 from .forms import UserProfileForm
+from models_app.models import UserProfile
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
