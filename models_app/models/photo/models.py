@@ -3,7 +3,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 
-from models_app.utils.img_save.utils import uploaded_file_path, skip_saving_file, save_file, delete_photo_file
+from models_app.utils.img_save.utils import uploaded_file_path, skip_saving_file, save_file, delete_photo_directory
 from models_app.models.base_model import BaseModel
 
 class Photo(BaseModel):
@@ -42,4 +42,4 @@ class Photo(BaseModel):
 
 pre_save.connect(skip_saving_file, sender=Photo)
 post_save.connect(save_file, sender=Photo)
-post_delete.connect(delete_photo_file, sender=Photo)
+post_delete.connect(delete_photo_directory, sender=Photo)

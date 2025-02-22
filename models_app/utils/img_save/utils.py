@@ -8,7 +8,24 @@ from django.db import models
 from django.db.models.fields.files import FieldFile
 from django.core.files.storage import default_storage
 
-def delete_photo_file(sender, instance, **kwargs):
+'''post_save PhotoVersion'''
+def move_photo_to_versions(sender, instance, created, **kwargs):
+    if created and instance.pk:
+        if instance.img:
+            file_path = pathlib.Path(instance.img.path)
+            versions_path = file_path.parent / "versions" 
+            versions_path.mkdir(exist_ok=True)
+            dest_path = versions_path / f"{instance.iteration}_{file_path.name}"
+            if default_storage.exists(file_path):
+                try:
+                    shutil.copy(file_path, dest_path)
+                    instance.img.name = str(dest_path.relative_to(default_storage.location))
+                    instance.save(update_fields=['img'])
+                except OSError as e:
+                    print(f"Error moving photo to versions: {e.strerror}")
+
+
+def delete_photo_directory(sender, instance, **kwargs):
     if instance.img:
         file_path = instance.img.path
         parent_dir = pathlib.Path(file_path).parents[1]
@@ -18,6 +35,7 @@ def delete_photo_file(sender, instance, **kwargs):
             except OSError as e:
                 print(f"Error deleting photo directory: {e.strerror}")
 
+
 def uploaded_file_path(instance: models.Model, filename: str) -> str:
     path = re.sub(r"(\d.+)(\d{3})(\d{3})$", r"\1/\2/\3", f"{instance.id:09d}")
     try:
@@ -26,7 +44,8 @@ def uploaded_file_path(instance: models.Model, filename: str) -> str:
     except Exception:
         return f"{instance.__class__.__name__.lower()}s/{path}/file/{filename}"
 
-'''pre_save'''
+
+'''pre_save Photo'''
 def skip_saving_file(sender: models.Model, instance: models.Model, **kwargs):
     if not instance.pk and not sender.__name__ == "Migration":
         file_fields = [
@@ -38,7 +57,8 @@ def skip_saving_file(sender: models.Model, instance: models.Model, **kwargs):
             setattr(instance, f"tmp_{field}_field", getattr(instance, field))
             setattr(instance, field, None)
 
-'''post_save'''
+
+'''post_save Photo'''
 def save_file(sender: models.Model, instance: models.Model, created: bool, **kwargs):
     if created and not sender.__name__ == "Migration":
         file_fields = [
