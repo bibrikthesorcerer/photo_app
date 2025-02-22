@@ -15,27 +15,7 @@
   </div>
 </div>
 
-{% if photos_page.has_other_pages %}
-  <nav id="paginationControls">
-    <ul class="pagination pagination-lg justify-content-center"> 
-      {% if photos_page.has_previous %}
-        <li class="page-item"><a class="page-link" href="?page=1&{{params}}">&laquo;</a></li>
-      {% endif %}
-      
-      {% for pg in photos_page.paginator.page_range %}
-        {% if pg == photos_page.number %}
-          <li class="page-item active"><span class="page-link">{{ photos_page.number }}</span></li>
-        {% elif pg >= photos_page.number|add:-2 and pg <= photos_page.number|add:2 %}
-          <li class="page-item"><a class="page-link" href="?page={{ pg }}&{{params}}">{{ pg }}</a></li>
-        {% endif %}
-      {% endfor %}
-      
-      {% if photos_page.has_next %}
-        <li class="page-item"><a class="page-link" href="?page={{ photos_page.paginator.num_pages }}&{{params}}">&raquo;</a></li>
-      {% endif %}
-    </ul>
-  </nav>
-{% endif %}
+{% include 'main_app/pagination.html' %}
 
 <div class="container text-center" id="postsList">
   <div class="row row-cols-auto justify-content-center">
@@ -60,7 +40,7 @@
           {% else %}
             <span class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
           {% endif %}
-          <span class="btn badge rounded-pill text-bg-primary comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</span>
+          <a href="{% url 'main_app:view_photo' ph.id %}#commentModal" class="btn badge rounded-pill text-bg-primary comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</a>
         </div>
       </div>
     </div>
@@ -68,5 +48,3 @@
 
   </div>
 </div>
-
-

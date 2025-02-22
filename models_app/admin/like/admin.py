@@ -1,5 +1,6 @@
 from django.contrib import admin
-from ...models import Like
+
+from models_app.models import Like
 
 @admin.register(Like)
 class LikeAdmin(admin.ModelAdmin):

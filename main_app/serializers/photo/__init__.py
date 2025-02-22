@@ -1,1 +1,1 @@
-from .show import PhotoSerializer
+from .show import PhotoSerializer, PhotoPageSerializer

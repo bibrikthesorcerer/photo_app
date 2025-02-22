@@ -45,12 +45,11 @@
                 </p>
                 <br>
                 {% if photo.comments_count != 0 %}
-                    <h3>Comments:</h3>
                     <div class="comment-list">
                         {% include 'main_app/comments_section.html' %}
                     </div>
                 {% else %}
-                    <h3>Be first to leave a comment!</h3>
+                    <div class="comment-list"></div>
                 {% endif %}
             </div>
         </div>

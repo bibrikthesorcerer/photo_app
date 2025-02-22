@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.paginator import Page
 
 from models_app.models import Photo
 
@@ -15,3 +16,10 @@ class PhotoSerializer(serializers.ModelSerializer):
                   "description", "img_thumbnail",
                   "user", "likes_count",
                   "comments_count", "is_liked"]
+        
+class PhotoPageSerializer(serializers.Serializer):
+    photos_page = PhotoSerializer(many=True, source='object_list')
+    total_pages = serializers.IntegerField(source='paginator.num_pages')
+    current_page = serializers.IntegerField(source='number')
+    has_next = serializers.BooleanField()
+    has_previous = serializers.BooleanField()

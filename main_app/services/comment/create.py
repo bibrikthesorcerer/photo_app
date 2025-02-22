@@ -6,10 +6,20 @@ from django import forms
 from models_app.models import Comment, UserProfile, Photo
 from models_app.admin.comment import CommentForm
 
-from main_app.services.photo import ReadPhotos
+from main_app.services.photo import RetrievePhoto
 from main_app.services.comment import RetrieveComment
 
 class CreateComment(ServiceWithResult):
+    """
+    Creates Comment object from given data
+
+    Parameters
+    ----------
+        photo_id (int): id of a photo to which comment is being left
+        parent_id (int, optional): id of a parent comment
+        user (UserProfile): instance of Author's UserProfile
+        text (str): comment's text
+    """
     photo_id = forms.IntegerField()
     parent_id = forms.IntegerField(required=False)
     user = ModelField(UserProfile)
@@ -37,8 +47,8 @@ class CreateComment(ServiceWithResult):
         parent_id = self.cleaned_data['parent_id']
         if not parent_id:
             return None
-        return RetrieveComment().execute({'pk': parent_id})
+        return RetrieveComment.execute({'pk': parent_id})
     
     def _get_related_photo(self) -> Photo:
         photo_id = self.cleaned_data['photo_id']
-        return ReadPhotos.execute({'pk': photo_id})
+        return RetrievePhoto.execute({'photo_id': photo_id})
