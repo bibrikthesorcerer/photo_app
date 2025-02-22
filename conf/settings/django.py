@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'social_django',
     'service_objects',
     'imagekit',
+    'django_extensions',
     'models_app.apps.ModelsAppConfig',
     'main_app.apps.MainAppConfig',
 ]
