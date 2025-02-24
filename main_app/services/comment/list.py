@@ -12,11 +12,9 @@ class ListComments(ServiceWithResult):
 
     Parameters
     ----------
-        include_deleted (bool, optional): whether or not to give out deleted comments
         photo_id (int, optional): id of a photo to which comments are left
         roots_only (bool, optional): whether or not to give out only root comments
     """
-    include_deleted = forms.BooleanField(required=False)
     photo_id = forms.IntegerField(required=False)
     roots_only = forms.BooleanField(required=False)
     
@@ -33,20 +31,16 @@ class ListComments(ServiceWithResult):
     def _order_by_date(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
         return objects.order_by('-pub_date')
     
-    #@validate_param('include_deleted')
     def _apply_filters(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
-        include_deleted = self.cleaned_data['include_deleted']
         photo_id = self.cleaned_data['photo_id']
         roots_only = self.cleaned_data['roots_only']
 
-        if not include_deleted:
-            objects = objects.filter(deleted_at=None)
         if photo_id:
             objects = objects.filter(photo=photo_id)
         if roots_only:
             objects = objects.filter(parent__isnull=True)
         
-        return objects
+        return objects.filter(deleted_at=None)
     
     def _all_comments_query(self) -> QuerySet[Comment]:
         return Comment.objects.all()

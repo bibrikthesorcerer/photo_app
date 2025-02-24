@@ -124,7 +124,7 @@ class ViewPhoto(View):
             **(self.kwargs | {"user": request.user})
         })
         comments = ListComments.execute({
-            **(self.kwargs | {'roots_only': True}),
+            **(self.kwargs | {'roots_only': True,}),
         })
 
         context = {

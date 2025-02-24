@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from decouple import config
 
 from models_app.models import Photo, Like, UserProfile
+from main_app.utils import validate_param
 
 class ListPhotos(ServiceWithResult):
     """
@@ -52,7 +53,7 @@ class ListPhotos(ServiceWithResult):
 
     def _all_photos_query(self):
         return Photo.objects.all()
-
+  
     def _get_paginated_queryset(self, objects: QuerySet) -> QuerySet:
         per_page = self.cleaned_data['per_page'] or config('PHOTOS_PER_PAGE', cast=int)
         page = self.cleaned_data['page']
@@ -65,10 +66,11 @@ class ListPhotos(ServiceWithResult):
         
         return objects
 
-    def _is_liked_by_user(self, objects: QuerySet) -> QuerySet:
-        user = self.cleaned_data['user']
-        if not user:
-                return objects
+    @validate_param('user')
+    def _is_liked_by_user(self, objects: QuerySet, user) -> QuerySet:
+        # user = self.cleaned_data['user']
+        # if not user:
+        #         return objects
         
         like_subquery = Like.objects.filter(
                 photo=OuterRef('pk'),
@@ -78,10 +80,11 @@ class ListPhotos(ServiceWithResult):
         
         return objects.annotate(is_liked=Exists(like_subquery))
 
-    def _search_for_entry(self, objects: QuerySet) -> QuerySet:
-        entry = self.cleaned_data['entry']
-        if not entry:
-                return objects
+    @validate_param('entry')
+    def _search_for_entry(self, objects: QuerySet, entry) -> QuerySet:
+        # entry = self.cleaned_data['entry']
+        # if not entry:
+        #         return objects
         
         return objects.filter(
                 Q(title__icontains=entry) | 
@@ -89,10 +92,11 @@ class ListPhotos(ServiceWithResult):
                 Q(user__username__icontains=entry)
                 )
 
-    def _order_data_by(self, objects: QuerySet) -> QuerySet:
-        ordering = self.cleaned_data['order']
-        if not ordering:
-                return objects
+    @validate_param('order')
+    def _order_data_by(self, objects: QuerySet, ordering) -> QuerySet:
+        # ordering = self.cleaned_data['order']
+        # if not ordering:
+        #         return objects
         
         return objects.order_by(ordering)
 
