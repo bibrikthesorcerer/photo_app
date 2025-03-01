@@ -1,5 +1,6 @@
+from typing import Any
 from service_objects.services import ServiceWithResult
-from service_objects.fields import DictField, ModelField
+from service_objects.fields import ModelField
 from django.db.models import Count, QuerySet, Exists, OuterRef
 from django import forms
 from django.db.models import Q
@@ -21,12 +22,14 @@ class ListPhotos(ServiceWithResult):
         author (UserProfile, optional): used to filter photos by user who created them
         per_page (int, optional): how many objects per page should paginator group together
         page (int, optional): number of page that paginator gives out
+        status (str, optional): status filter based on Photo's STATUS_CHOICES
     """
     entry = forms.CharField(required=False)
     user = ModelField(UserProfile, required=False)
     author = ModelField(UserProfile, required=False)
     per_page = forms.IntegerField(required=False)
     page = forms.IntegerField(required=False)
+    status = forms.ChoiceField(choices=Photo.STATUS_CHOICES, required=False)
 
     ORDER_CHOICES = (
         ("likes_count", "", ),
@@ -58,13 +61,26 @@ class ListPhotos(ServiceWithResult):
         per_page = self.cleaned_data['per_page'] or config('PHOTOS_PER_PAGE', cast=int)
         page = self.cleaned_data['page']
         return Paginator(objects, per_page).get_page(page)
+    
+    def _build_filters(self) -> Q:
+        filters = Q()
+        # filters.add()
+        if self.cleaned_data.get('author'):
+            filters &= Q(user=self.cleaned_data.get('author'))
+        if self.cleaned_data.get('status'):
+            filters &= Q(status=self.cleaned_data.get('status'))
+
+        return filters
 
     def _apply_filters(self, objects: QuerySet) -> QuerySet:
-        author =  self.cleaned_data['author']
-        if author:
-             objects = objects.filter(user=author)
+        # author = self.cleaned_data['author']
+        # status = self.cleaned_data['status']
+        # if author:
+        #     objects = objects.filter(user=author)
+        # if status:
+        #     objects = objects.filter(status=status)
         
-        return objects
+        return objects.filter(self._build_filters())
 
     @validate_param('user')
     def _is_liked_by_user(self, objects: QuerySet, user) -> QuerySet:

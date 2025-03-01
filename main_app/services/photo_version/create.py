@@ -1,7 +1,7 @@
 from django.forms import IntegerField
 from service_objects.services import ServiceWithResult
 
-from main_app.services import RetrievePhoto
+from main_app.services.photo.retrieve import RetrievePhoto
 from models_app.models import PhotoVersion
 
 class CreatePhotoVersion(ServiceWithResult):

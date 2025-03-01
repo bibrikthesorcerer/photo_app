@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from models_app.admin.user_profile.forms import UserProfileForm
-from main_app.services import ListPhotos, GetUserGithubPFP
+from main_app.services import ListPhotos, GetUserGithubPFP, UpdateUserProfile
 
 
 class UserProfileView(LoginRequiredMixin, View):
@@ -30,10 +30,11 @@ class UserProfileView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
     
     def post(self, request, *args, **kwargs):
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile is updated successfully')
+        is_success = UpdateUserProfile.execute({
+            **(request.POST.dict() | {"user": request.user})
+        })
+        if is_success:
+            messages.success(request, 'Your profile has been updated successfully')
             return redirect('main_app:profile')
         
         return self.get(request, *args, **kwargs)

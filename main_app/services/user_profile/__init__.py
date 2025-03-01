@@ -1,1 +1,1 @@
-from .manage import GetUserGithubPFP
+from .manage import GetUserGithubPFP, UpdateUserProfile

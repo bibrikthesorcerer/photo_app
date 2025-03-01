@@ -1,10 +1,14 @@
+from copy import deepcopy
 from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
 from decouple import config
+from django import forms
 import pathlib
 
 from main_app.tasks import delete_photo_by_id
-from models_app.models import Photo
+from models_app.admin.photo.forms import PhotoForm
+from models_app.models import Photo, UserProfile
+from main_app.services.photo_version.create import CreatePhotoVersion
 
 
 class ManageOldImage(ServiceWithResult):
@@ -73,4 +77,30 @@ class RecoverPhotoBeforeDeletion(ServiceWithResult):
         photo_obj.status = Photo.ON_MODERATION
         photo_obj.save()
         self.result = True
+        return self.result
+
+
+class UpdatePhoto(ServiceWithResult):
+    title = forms.CharField(max_length=64,required=False)
+    description = forms.CharField(max_length=256,required=False)
+    img = forms.ImageField(required=False)
+    photo = ModelField(Photo)
+
+    def _collect_form_data(self) -> dict[str, str]:
+        post = {
+            "title": self.cleaned_data.get("title"),
+            "description": self.cleaned_data.get("description"),
+            "img": self.cleaned_data.get("img")
+        }
+        files = {"img": self.cleaned_data.get("img")}
+        return (post, files)
+    
+    def process(self) -> Photo|None:
+        photo = self.cleaned_data.get("photo")
+        form = PhotoForm(*self._collect_form_data(), instance=deepcopy(photo))
+        self.result = None
+        if form.is_valid():
+            CreatePhotoVersion.execute({"photo_id":photo.id})
+            ManageOldImage.execute({"new_photo":form.instance, "old_photo": photo})
+            self.result = form.save()
         return self.result
