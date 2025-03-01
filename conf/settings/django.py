@@ -16,6 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
+    'models_app.apps.ModelsAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -27,7 +28,7 @@ INSTALLED_APPS = [
     'service_objects',
     'imagekit',
     'django_extensions',
-    'models_app.apps.ModelsAppConfig',
+    'viewflow',
     'main_app.apps.MainAppConfig',
 ]
 

@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from copy import deepcopy
 
+from models_app.models import Photo
 from models_app.admin import PhotoForm
 from main_app.services import ListComments
 from main_app.services import CreatePhotoVersion
@@ -61,7 +62,8 @@ class IndexView(View):
             user = None
         
         photos = ListPhotos.execute({
-            **(request.GET.dict() | {"user": user})
+            **(request.GET.dict() 
+               | {"user": user, "status": Photo.APPROVED})
         })
 
         if request.headers.get('X-Requested-With', None):
