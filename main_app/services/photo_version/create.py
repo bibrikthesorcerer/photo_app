@@ -1,7 +1,7 @@
 from django.forms import IntegerField
 from service_objects.services import ServiceWithResult
 
-from main_app.services import RetrievePhoto
+from main_app.services.photo.retrieve import RetrievePhoto
 from models_app.models import PhotoVersion
 
 class CreatePhotoVersion(ServiceWithResult):
@@ -15,7 +15,7 @@ class CreatePhotoVersion(ServiceWithResult):
     photo_id = IntegerField()
 
     def process(self) -> PhotoVersion:
-        photo_id = self.cleaned_data['photo_id']
+        photo_id = self.cleaned_data.get('photo_id')
         current_photo = RetrievePhoto.execute({"photo_id": photo_id})
 
         last_version = PhotoVersion.objects.filter(photo_id=photo_id).order_by('-iteration').first()

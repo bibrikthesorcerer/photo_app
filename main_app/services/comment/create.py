@@ -31,8 +31,8 @@ class CreateComment(ServiceWithResult):
         data = {
             'parent': parent,
             'photo': photo,
-            'user': self.cleaned_data['user'],
-            'text': self.cleaned_data['text']
+            'user': self.cleaned_data.get('user'),
+            'text': self.cleaned_data.get('text')
         }
         form = CommentForm(data)
         if form.is_valid():
@@ -44,11 +44,11 @@ class CreateComment(ServiceWithResult):
         return self.result
     
     def _get_parent_comment(self) -> Comment:
-        parent_id = self.cleaned_data['parent_id']
+        parent_id = self.cleaned_data.get('parent_id')
         if not parent_id:
             return None
         return RetrieveComment.execute({'pk': parent_id})
     
     def _get_related_photo(self) -> Photo:
-        photo_id = self.cleaned_data['photo_id']
+        photo_id = self.cleaned_data.get('photo_id')
         return RetrievePhoto.execute({'photo_id': photo_id})

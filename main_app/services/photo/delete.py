@@ -15,7 +15,7 @@ class DeletePhoto(ServiceWithResult):
     photo_id = forms.IntegerField()
 
     def process(self):
-        photo_id = self.cleaned_data['photo_id']
+        photo_id = self.cleaned_data.get('photo_id')
         photos = Photo.objects.filter(id=photo_id, status=Photo.TO_BE_DELETED)
         self.result = photos.delete()
         return self.result

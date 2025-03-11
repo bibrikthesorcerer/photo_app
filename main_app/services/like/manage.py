@@ -18,8 +18,8 @@ class UpdateOrCreateLike(ServiceWithResult):
     user = ModelField(UserProfile)
 
     def process(self) -> QuerySet[Like]:
-        photo = self.cleaned_data['photo']
-        user = self.cleaned_data['user']
+        photo = self.cleaned_data.get('photo')
+        user = self.cleaned_data.get('user')
         self.result, _created = Like.objects.update_or_create(
             photo=photo,
             user=user,

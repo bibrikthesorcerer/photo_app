@@ -5,9 +5,10 @@ from django.forms.models import model_to_dict
 
 from main_app.services import UpdateOrCreateLike, DeleteLike
 from main_app.services import RetrievePhoto
+from main_app.permissions import PlainUserOnly
 
 
-class CreateLike(LoginRequiredMixin, View):
+class CreateLike(PlainUserOnly, LoginRequiredMixin, View):
     login_url='/login/github'
 
     def post(self, request):
@@ -21,12 +22,12 @@ class CreateLike(LoginRequiredMixin, View):
         return JsonResponse(model_to_dict(like_obj))
 
 
-class RemoveLike(LoginRequiredMixin, View):
+class RemoveLike(PlainUserOnly, LoginRequiredMixin, View):
     login_url='/login/github'
 
     def post(self, request):
         like_obj = DeleteLike.execute({
-            **(request.POST.dict() | {'user_id': request.user.id}) 
+            **(request.POST.dict() | {'user_id': request.user.id})
         })
         
         return JsonResponse(model_to_dict(like_obj))

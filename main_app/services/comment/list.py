@@ -32,8 +32,8 @@ class ListComments(ServiceWithResult):
         return objects.order_by('-pub_date')
     
     def _apply_filters(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
-        photo_id = self.cleaned_data['photo_id']
-        roots_only = self.cleaned_data['roots_only']
+        photo_id = self.cleaned_data.get('photo_id')
+        roots_only = self.cleaned_data.get('roots_only')
 
         if photo_id:
             objects = objects.filter(photo=photo_id)
@@ -90,6 +90,6 @@ class ListThread(ServiceWithResult):
         return {comm: ancestors}
 
     def _read_thread(self) -> dict[Comment, list[dict]]:
-        root_id = self.cleaned_data['root_id']
-        self.max_depth = self.cleaned_data['max_depth'] or config('THREAD_MAX_DEPTH', cast=int)
+        root_id = self.cleaned_data.get('root_id')
+        self.max_depth = self.cleaned_data.get('max_depth') or config('THREAD_MAX_DEPTH', cast=int)
         return self._read_children_recursively(root_id, 0)

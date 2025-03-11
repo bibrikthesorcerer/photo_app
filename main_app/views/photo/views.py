@@ -7,12 +7,10 @@ from copy import deepcopy
 
 from models_app.models import Photo
 from models_app.admin import PhotoForm
-from main_app.services import ListComments
-from main_app.services import CreatePhotoVersion
 from main_app.serializers import PhotoPageSerializer
 from main_app.services import (RetrievePhoto, ListPhotos, 
                                RecoverPhotoBeforeDeletion, SchedulePhotoDeletion,
-                               ManageOldImage)
+                               ListComments, CreatePhoto, UpdatePhoto)
 
 
 class DeletePhoto(LoginRequiredMixin, View):
@@ -42,15 +40,15 @@ class EditPhoto(LoginRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         photo_obj = self._get_editing_photo()
-        form = PhotoForm(request.POST, request.FILES, instance=deepcopy(photo_obj))
-        if form.is_valid():
-            CreatePhotoVersion.execute({**self.kwargs})
-            ManageOldImage.execute({"new_photo":form.instance, "old_photo": photo_obj})
-            photo_obj = form.save()
+        is_success = UpdatePhoto.execute(
+            {**(request.POST.dict() | {"photo": photo_obj})},
+            request.FILES
+        )
+        if is_success:
             messages.success(request, 'Photo uploaded successfully')
             return redirect('main_app:profile')
         
-        return render(request, self.template_name, {'form': form})
+        return self.get(request, *args, **kwargs)
 
 
 class IndexView(View):
@@ -104,14 +102,15 @@ class UploadPhoto(LoginRequiredMixin, View):
         return render(request, self.template_name, {'form': PhotoForm})
     
     def post(self, request, *args, **kwargs):
-        form = PhotoForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.instance.user = request.user
-            form.save()
+        is_success = CreatePhoto.execute(
+            {**(request.POST.dict() | {"user": request.user})},
+            request.FILES
+        )
+        if is_success:
             messages.success(request, 'Photo uploaded successfully')
             return redirect('main_app:profile')
         
-        return render(request, self.template_name, {'form': form})
+        return self.get(request, *args, **kwargs)
     
 
 class ViewPhoto(View):
