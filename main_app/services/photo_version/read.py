@@ -13,4 +13,4 @@ class ReadPhotoVersionsByPhotoID(Service):
     photo_id = forms.IntegerField()
 
     def process(self) -> QuerySet[PhotoVersion]:
-        return PhotoVersion.objects.filter(photo=self.cleaned_data['photo_id']).order_by('-created_at')
+        return PhotoVersion.objects.filter(photo=self.cleaned_data.get('photo_id')).order_by('-created_at')

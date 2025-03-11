@@ -27,14 +27,14 @@ class RetrievePhoto(ServiceWithResult):
         return self.result
     
     def _get_photo_instance(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
-        pk = self.cleaned_data['photo_id']
+        pk = self.cleaned_data.get('photo_id')
         return objects.get(pk=pk)
 
     def _all_photos_query(self):
         return Photo.objects.all()
 
     def _is_liked_by_user(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
-        user = self.cleaned_data['user']
+        user = self.cleaned_data.get('user')
         if not user:
                 return objects
         

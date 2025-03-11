@@ -16,8 +16,8 @@ class DeleteLike(ServiceWithResult):
     user_id = forms.IntegerField()
 
     def process(self) -> Like:
-        photo_id = self.cleaned_data['photo_id']
-        user_id = self.cleaned_data['user_id']
+        photo_id = self.cleaned_data.get('photo_id')
+        user_id = self.cleaned_data.get('user_id')
         like_obj = Like.objects.filter(photo=photo_id, user=user_id).delete()
         self.result = like_obj.first()
         return self.result

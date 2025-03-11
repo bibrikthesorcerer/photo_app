@@ -15,7 +15,7 @@ class CreatePhotoVersion(ServiceWithResult):
     photo_id = IntegerField()
 
     def process(self) -> PhotoVersion:
-        photo_id = self.cleaned_data['photo_id']
+        photo_id = self.cleaned_data.get('photo_id')
         current_photo = RetrievePhoto.execute({"photo_id": photo_id})
 
         last_version = PhotoVersion.objects.filter(photo_id=photo_id).order_by('-iteration').first()

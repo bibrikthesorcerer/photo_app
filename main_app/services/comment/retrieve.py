@@ -26,7 +26,7 @@ class RetrieveComment(ServiceWithResult):
         return Comment.objects.all()
     
     def _get_data(self, objects: QuerySet) -> Comment:
-        pk = self.cleaned_data['pk']
+        pk = self.cleaned_data.get('pk')
         return objects.get(pk=pk)
     
     def _prefetch_children(self, objects: QuerySet) -> QuerySet:

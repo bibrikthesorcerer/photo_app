@@ -24,8 +24,8 @@ class ManageOldImage(ServiceWithResult):
     old_photo = ModelField(Photo)
 
     def process(self) -> bool:
-        new_photo = self.cleaned_data['new_photo']
-        old_photo = self.cleaned_data['old_photo']
+        new_photo = self.cleaned_data.get('new_photo')
+        old_photo = self.cleaned_data.get('old_photo')
         if new_photo.img != old_photo.img:
             file_path = pathlib.Path(old_photo.img.path)
             file_path.unlink(missing_ok=True)
@@ -46,7 +46,7 @@ class SchedulePhotoDeletion(ServiceWithResult):
     photo = ModelField(Photo)
 
     def process(self) -> bool:
-        photo_obj = self.cleaned_data['photo']
+        photo_obj = self.cleaned_data.get('photo')
         if photo_obj.status == Photo.TO_BE_DELETED:
             self.result = False
             return self.result
@@ -69,7 +69,7 @@ class RecoverPhotoBeforeDeletion(ServiceWithResult):
     photo = ModelField(Photo)
 
     def process(self) -> bool:
-        photo_obj = self.cleaned_data['photo']
+        photo_obj = self.cleaned_data.get('photo')
         if photo_obj.status != Photo.TO_BE_DELETED:
             self.result = False
             return self.result

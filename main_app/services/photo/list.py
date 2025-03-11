@@ -58,33 +58,25 @@ class ListPhotos(ServiceWithResult):
         return Photo.objects.all()
   
     def _get_paginated_queryset(self, objects: QuerySet) -> QuerySet:
-        per_page = self.cleaned_data['per_page'] or config('PHOTOS_PER_PAGE', cast=int)
-        page = self.cleaned_data['page']
+        per_page = self.cleaned_data.get('per_page', config('PHOTOS_PER_PAGE', cast=int))
+        page = self.cleaned_data.get('page')
         return Paginator(objects, per_page).get_page(page)
     
     def _build_filters(self) -> Q:
         filters = Q()
-        # filters.add()
         if self.cleaned_data.get('author'):
-            filters &= Q(user=self.cleaned_data.get('author'))
+            filters.add(Q(user=self.cleaned_data.get('author')), Q.AND)
         if self.cleaned_data.get('status'):
-            filters &= Q(status=self.cleaned_data.get('status'))
+            filters.add(Q(status=self.cleaned_data.get('status')), Q.AND)
 
         return filters
 
-    def _apply_filters(self, objects: QuerySet) -> QuerySet:
-        # author = self.cleaned_data['author']
-        # status = self.cleaned_data['status']
-        # if author:
-        #     objects = objects.filter(user=author)
-        # if status:
-        #     objects = objects.filter(status=status)
-        
+    def _apply_filters(self, objects: QuerySet) -> QuerySet:        
         return objects.filter(self._build_filters())
 
     @validate_param('user')
     def _is_liked_by_user(self, objects: QuerySet, user) -> QuerySet:
-        # user = self.cleaned_data['user']
+        # user = self.cleaned_data.get('user')
         # if not user:
         #         return objects
         
@@ -98,7 +90,7 @@ class ListPhotos(ServiceWithResult):
 
     @validate_param('entry')
     def _search_for_entry(self, objects: QuerySet, entry) -> QuerySet:
-        # entry = self.cleaned_data['entry']
+        # entry = self.cleaned_data.get('entry')
         # if not entry:
         #         return objects
         
@@ -110,7 +102,7 @@ class ListPhotos(ServiceWithResult):
 
     @validate_param('order')
     def _order_data_by(self, objects: QuerySet, ordering) -> QuerySet:
-        # ordering = self.cleaned_data['order']
+        # ordering = self.cleaned_data.get('order')
         # if not ordering:
         #         return objects
         

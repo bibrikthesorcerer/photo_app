@@ -10,7 +10,7 @@ class GetUserGithubPFP(ServiceWithResult):
     user = ModelField(UserProfile)
 
     def process(self) -> str:
-        user =  self.cleaned_data['user']
+        user =  self.cleaned_data.get('user')
         social_profile = user.social_auth.first()
         self.result = ''
         if social_profile:
