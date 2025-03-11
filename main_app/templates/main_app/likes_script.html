@@ -1,3 +1,13 @@
+<div aria-live="polite" aria-atomic="true" class="toast-container m-3" style="position: sticky; bottom: 0px; float: right;">
+    <div id="adminPermissionDenied" class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+            <strong class="me-auto">PhotoApp</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body fs-5">
+        </div>
+    </div>
+</div>
 <script>
     likeButtons = document.getElementsByClassName('like-button');
     likeButtonsArray = [...likeButtons];
@@ -29,19 +39,19 @@
                 },
                 success: function(response){
                     console.log('SERVER RESPONDED:', response);
-                    if(response.status == 'duplicate'){
-                        console.error('You have already liked this photo');
-                    }
-                    else{
-                        elem.classList.remove('text-bg-primary');
-                        elem.classList.add('text-bg-danger');
-                        numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
-                        numOfLikes++;
-                        elem.innerHTML = '' + numOfLikes + ' ❤';
-                    }
+                    elem.classList.remove('text-bg-primary');
+                    elem.classList.add('text-bg-danger');
+                    numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
+                    numOfLikes++;
+                    elem.innerHTML = '' + numOfLikes + ' ❤';
                 },
                 error: function(xhr){
                     console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+                    if (xhr.status === 403){
+                        toast = $('#adminPermissionDenied')
+                        $(toast).find(".toast-body:first").html(xhr.responseJSON.message)
+                        $(toast).toast('show');
+                    }
                 }
             });
     }
@@ -64,6 +74,11 @@
                 },
                 error: function(xhr){
                     console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
+                    if (xhr.status === 403){
+                        toast = $('#adminPermissionDenied')
+                        $(toast).find(".toast-body:first").html(xhr.responseJSON.message)
+                        $(toast).toast('show');
+                    }
                 }
             });
     }
