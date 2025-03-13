@@ -59,7 +59,7 @@
 
 {% block scripts %}
 
-{% include 'main_app/likes_script.html' %}
+<script src="{% static 'main_app/js/likes_script.js' %}" csrf_token="{{csrf_token}}"></script>
 {% include 'main_app/comment_script.html' %}
 
 {% endblock %}
