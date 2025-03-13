@@ -16,6 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'models_app.apps.ModelsAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'viewflow',
     'main_app.apps.MainAppConfig',
+    'notifications.apps.NotificationsConfig'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +64,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'conf.wsgi.application'
+ASGI_APPLICATION = 'conf.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 AUTH_USER_MODEL = 'models_app.UserProfile'
 

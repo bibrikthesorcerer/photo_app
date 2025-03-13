@@ -25,6 +25,8 @@ django-extensions = "^3.2.3"
 pyparsing = "^3.2.1"
 pydot = "^3.0.4"
 pre-commit = "^4.1.0"
+daphne = "^4.1.2"
+channels-redis = "^4.2.1"
 
 
 [build-system]
