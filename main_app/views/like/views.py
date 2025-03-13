@@ -8,7 +8,7 @@ from main_app.services import RetrievePhoto
 from main_app.permissions import PlainUserOnly
 
 
-class CreateLike(PlainUserOnly, LoginRequiredMixin, View):
+class CreateLike(PlainUserOnly, View):
     login_url='/login/github'
 
     def post(self, request):
@@ -22,7 +22,7 @@ class CreateLike(PlainUserOnly, LoginRequiredMixin, View):
         return JsonResponse(model_to_dict(like_obj))
 
 
-class RemoveLike(PlainUserOnly, LoginRequiredMixin, View):
+class RemoveLike(PlainUserOnly, View):
     login_url='/login/github'
 
     def post(self, request):
