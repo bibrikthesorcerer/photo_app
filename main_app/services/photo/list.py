@@ -58,7 +58,7 @@ class ListPhotos(ServiceWithResult):
         return Photo.objects.all()
   
     def _get_paginated_queryset(self, objects: QuerySet) -> QuerySet:
-        per_page = self.cleaned_data.get('per_page', config('PHOTOS_PER_PAGE', cast=int))
+        per_page = self.cleaned_data.get('per_page') or config('PHOTOS_PER_PAGE', cast=int)
         page = self.cleaned_data.get('page')
         return Paginator(objects, per_page).get_page(page)
     
