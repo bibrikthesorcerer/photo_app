@@ -1,0 +1,45 @@
+{% extends "admin/index.html" %}
+
+{% block sidebar %}
+{{block.super}}
+<div id="notifyContainer" style="margin-bottom: 3%;">
+    <h1>Send Notification</h1>
+    <form id="notifyForm">
+        <textarea type="text" name="message" rows="3" cols="25" style="resize:none;"></textarea>
+        <input type="submit" value="Send">
+    </form>
+    <script>
+        url = `ws://${window.location.host}/notify/`
+        notifySocket = new WebSocket(url)
+        let form = document.getElementById("notifyForm")
+        form.addEventListener("submit", function(event){
+            event.preventDefault()
+            let message = event.target.message.value
+            notifySocket.send(JSON.stringify({
+                'type': 'notification',
+                'group': 'server-wide-shout',
+                'message': message
+            }))
+            form.reset()
+            showAlert(`Notification "${message}" sent successfully!`, 5000)
+        })
+
+        function showAlert(message, duration) {
+            msgList = document.getElementById('wsSent') 
+            if (msgList == undefined){
+                msgList = document.createElement('ul')
+                msgList.className = 'messagelist'
+                document.getElementById('notifyContainer').appendChild(msgList)
+            }
+            const alertDiv = document.createElement('li')
+            alertDiv.className = 'success'
+            alertDiv.innerHTML = message
+            msgList.appendChild(alertDiv)
+            setTimeout(() => {
+                alertDiv.remove()
+            }, duration)
+        }
+    </script>
+</div>
+
+{% endblock %}

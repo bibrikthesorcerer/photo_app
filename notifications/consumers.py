@@ -20,8 +20,8 @@ class NotificationConsumer(WebsocketConsumer):
         if self.user.role == self.user.ROLE_USER:
             return
         data = json.loads(text_data)
-        message = data['message']
-        group = data['group']
+        message = data.get('message')
+        group = data.get('group')
         async_to_sync(self.channel_layer.group_send)(
             group,
             {
@@ -31,10 +31,26 @@ class NotificationConsumer(WebsocketConsumer):
         )
     
     def send_notification(self, event):
-        message = event['message']
-
         self.send(text_data=json.dumps({
             'type': 'notification',
-            'message': message,
+            'message': event.get('message'),
             'timestamp': now().strftime("%H:%M:%S")
+        }))
+
+    def notify_like(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'notify_like',
+            'message': event.get('message'),
+            'timestamp': now().strftime("%H:%M:%S"),
+            'likes_count': event.get('likes_count'),
+            'photo_id': event.get('photo_id')
+        }))
+
+    def notify_comment(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'notify_comment',
+            'message': event.get('message'),
+            'timestamp': now().strftime("%H:%M:%S"),
+            'comments_count': event.get('comments_count'),
+            'photo_id': event.get('photo_id')
         }))
