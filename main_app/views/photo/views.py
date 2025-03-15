@@ -10,7 +10,8 @@ from models_app.admin import PhotoForm
 from main_app.serializers import PhotoPageSerializer
 from main_app.services import (RetrievePhoto, ListPhotos, 
                                RecoverPhotoBeforeDeletion, SchedulePhotoDeletion,
-                               ListComments, CreatePhoto, UpdatePhoto)
+                               ListComments, CreatePhoto, UpdatePhoto,
+                               SendCommentWillBeDeletedNotification)
 
 
 class DeletePhoto(LoginRequiredMixin, View):
@@ -21,6 +22,7 @@ class DeletePhoto(LoginRequiredMixin, View):
         sched_result = SchedulePhotoDeletion.execute({'photo': photo_obj})
         if sched_result is True:
             messages.success(request, 'Photo scheduled to be deleted successfully')
+            SendCommentWillBeDeletedNotification.execute({"photo": photo_obj})
         else:
             messages.warning(request, "Couldn't schedule deletion of photo")
         return redirect('main_app:profile')
@@ -122,7 +124,7 @@ class ViewPhoto(View):
             user = None
         
         photo_obj = RetrievePhoto.execute({
-            **(self.kwargs | {"user": request.user})
+            **(self.kwargs | {"user": user})
         })
         comments = ListComments.execute({
             **(self.kwargs | {'roots_only': True,}),

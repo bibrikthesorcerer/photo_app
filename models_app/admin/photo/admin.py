@@ -9,6 +9,7 @@ from django.contrib import messages
 from models_app.models import Photo
 from main_app.services import RetrievePhoto, ReadPhotoVersionsByPhotoID
 from .flows import PhotoModerationFlow
+from notifications.utils import send_message_to_list_of_users
 
 
 @admin.register(Photo)
@@ -70,6 +71,11 @@ class PhotoAdmin(admin.ModelAdmin):
             return redirect("admin:index")
         flow = PhotoModerationFlow(photo_obj)
         flow.approve()
+        send_message_to_list_of_users(
+            [photo_obj.user.id],
+            "send_notification",
+            f"Your photo titled '{photo_obj.title}' had been approved!"
+        )
         self.message_user(request, "Selected photo approved.")
         return redirect("admin:index")
 
@@ -82,5 +88,10 @@ class PhotoAdmin(admin.ModelAdmin):
             return redirect("admin:index")
         flow = PhotoModerationFlow(photo_obj)
         flow.deny()
+        send_message_to_list_of_users(
+            [photo_obj.user.id],
+            "send_notification",
+            f"Your photo titled '{photo_obj.title}' had been denied"
+        )
         self.message_user(request, "Selected photo denied.")
         return redirect("admin:index")

@@ -4,7 +4,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from main_app.serializers.comment import CommentSerializer
-from main_app.services import CreateComment, ListThread, DeleteComment
+from main_app.services import CreateComment, ListThread, DeleteComment, SendCommentNotification
 
 
 class DeleteCommentView(LoginRequiredMixin, View):
@@ -19,10 +19,13 @@ class DeleteCommentView(LoginRequiredMixin, View):
 class LeaveCommentView(LoginRequiredMixin, View):
 
     def post(self, request):
-        foo = request.POST.get('photo_id')
         result, instance = CreateComment().execute({
             **(request.POST.dict() | {"user":request.user}),
         })
+        if result == True:
+            SendCommentNotification.execute({
+                **(request.POST.dict() | {"user":request.user}),
+            })
         return JsonResponse(CommentSerializer(instance).data)
     
 

@@ -16,6 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'models_app.apps.ModelsAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'viewflow',
     'main_app.apps.MainAppConfig',
+    'notifications.apps.NotificationsConfig'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +64,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'conf.wsgi.application'
+ASGI_APPLICATION = 'conf.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 AUTH_USER_MODEL = 'models_app.UserProfile'
 
@@ -117,6 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'main_app/static/',
+    BASE_DIR / 'notifications/static/',
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

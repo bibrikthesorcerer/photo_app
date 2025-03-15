@@ -1,5 +1,5 @@
 {% extends 'main_app/base.html' %}
-
+{% load static %}
 {% block head %}
 <title>Home | PhotoApp</title>
 {% endblock %}
@@ -12,7 +12,7 @@
 
 {% block scripts %}
 
-{% include 'main_app/search_sort_script.html' %}
-{% include 'main_app/likes_script.html' %}
+<script src="{% static 'main_app/js/search_sort_script.js' %}"></script>
+<script src="{% static 'main_app/js/likes_script.js' %}" csrf_token="{{csrf_token}}"></script>
 
 {% endblock %}
