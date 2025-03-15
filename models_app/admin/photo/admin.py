@@ -15,9 +15,10 @@ from notifications.utils import send_message_to_list_of_users
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ["title", "admin_thumbnail", "user", "status", "moderation"]
-    search_fields = list_display + ["description"]
+    search_fields = ["title", "description"]
     admin_thumbnail = AdminThumbnail(image_field="admin_thumbnail")
     readonly_fields = ["status", "pub_date"]
+    list_filter = ["status", "user", "pub_date", "updated_at", "created_at"]
 
     def get_urls(self):
         urls = super().get_urls()
