@@ -24,6 +24,22 @@
                         {{ photo.description }}
                     </p>
                 </div>
+                <div class="card-footer">
+                    {% for review in photo.review_tickets.all %}
+                        <h5>Review result:</h5>
+                        {% if review.result == photo.APPROVED %}
+                            <span class="badge rounded-pill text-bg-success mb-3">
+                                {{review.get_result_display}}
+                            </span
+                        {% elif review.result == photo.DENIED %}
+                            <span class="badge rounded-pill text-bg-danger mb-3">
+                                {{review.get_result_display}}
+                            </span>
+                            <h5>Review commentary</h5>
+                            <p>{{review.commentary}}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
@@ -39,7 +55,7 @@
             <div class="col">
                 <div class="card shadow-sm">
                     <div class="mx-3 mt-3 justify-content-center">
-                        <h2>#{{forloop.revcounter}}</h2>
+                        <h2>#{{version.iteration}}</h2>
                         <p class="text-muted mb-0">Created on: {{ version.created_at|date:"M d, Y H:i:s" }}</p>
                     </div>
                     <div class="card-body">
@@ -49,6 +65,22 @@
                         <p class="card-text">
                             {{ version.description }}
                         </p>
+                    </div>
+                    <div class="card-footer">
+                        {% for review in version.review_tickets.all %}
+                            <h5>Review result:</h5>
+                            {% if review.result == photo.APPROVED%}
+                                <span class="badge rounded-pill text-bg-success mb-3">
+                                    {{review.get_result_display}}
+                                </span>
+                            {% elif review.result == photo.DENIED %}
+                                <span class="badge rounded-pill text-bg-danger mb-3">
+                                    {{review.get_result_display}}
+                                </span>
+                                <h5>Review commentary</h5>
+                                <p>{{review.commentary}}</p>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>

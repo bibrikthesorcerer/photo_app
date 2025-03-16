@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from copy import deepcopy
 
 from models_app.models import Photo
 from models_app.admin import PhotoForm

@@ -4,7 +4,7 @@
 <div class="row row-cols-auto justify-content-center">
 {% for ph in photos_page %}
     <div class="col">
-        <div class="card shadow-sm" style="width: 18rem;">
+        <div class="card shadow-sm" style="width: 25rem;">
             <div class="card-body bg-body-tertiary">
                 <div style="transform: rotate(0);">
                     <a href="{% url 'main_app:view_photo' ph.id %}" class="stretched-link"></a>
@@ -26,13 +26,15 @@
                 </div>
                 <hr>
                 <p class="card-text">{{ph.description}}</p>
-                <a href="{% url 'main_app:view_photo_versions' ph.id %}" class="btn btn-primary">Versions</a>
-                <a href="{% url 'main_app:edit_photo' ph.id %}" class="btn btn-primary">Edit</a>
-                {% if ph.status == ph.TO_BE_DELETED %}
-                    <a href="{% url 'main_app:recover_photo' ph.id %}" class="btn btn-warning">Recover</a>
-                {% else %}
-                    <a href="{% url 'main_app:delete_photo' ph.id %}" class="btn btn-danger">Delete</a>
-                {% endif %}
+                <div class="btn-group-sm" role="group">
+                    <a href="{% url 'main_app:view_photo_versions' ph.id %}" class="btn btn-primary">Versions and Reviews</a>
+                    <a href="{% url 'main_app:edit_photo' ph.id %}" class="btn btn-primary">Edit</a>
+                    {% if ph.status == ph.TO_BE_DELETED %}
+                        <a href="{% url 'main_app:recover_photo' ph.id %}" class="btn btn-warning">Recover</a>
+                    {% else %}
+                        <a href="{% url 'main_app:delete_photo' ph.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

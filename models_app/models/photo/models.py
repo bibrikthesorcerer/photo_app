@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
@@ -49,6 +50,10 @@ class Photo(BaseModel):
         processors=[ResizeToFit(100, 100)],
         format="JPEG",
         options={"quality": 60},
+    )
+
+    review_tickets = GenericRelation(
+        "models_app.ReviewTicket", related_query_name="photo_version"
     )
 
     def __str__(self):

@@ -22,6 +22,7 @@ class RetrievePhoto(ServiceWithResult):
         objects = self._all_photos_query()
         objects = self._count_likes_and_comments(objects)
         objects = self._select_related_user(objects)
+        objects = self._prefetch_related(objects)
         objects = self._is_liked_by_user(objects)
         self.result = self._get_photo_instance(objects)
         return self.result
@@ -52,3 +53,6 @@ class RetrievePhoto(ServiceWithResult):
 
     def _select_related_user(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
         return objects.select_related('user')
+    
+    def _prefetch_related(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
+        return objects.prefetch_related('review_tickets')
