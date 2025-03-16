@@ -75,7 +75,9 @@ class RecoverPhotoBeforeDeletion(ServiceWithResult):
             self.result = False
             return self.result
         
-        photo_obj.status = Photo.ON_MODERATION
+        # get review ticket associated with photo
+        ticket = photo_obj.review_tickets.first()
+        photo_obj.status = ticket.result if ticket else Photo.ON_MODERATION
         photo_obj.save()
         self.result = True
         return self.result

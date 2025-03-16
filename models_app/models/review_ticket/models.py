@@ -23,6 +23,11 @@ class ReviewTicket(BaseModel):
         return f"ReviewTicket for {self.reviewed_object}"
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["object_id", "content_type"], name="unique_review_photo"
+            )
+        ]
         verbose_name = "review_ticket"
         verbose_name_plural = "review_tickets"
         db_table = "review_tickets"
