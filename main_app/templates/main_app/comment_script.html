@@ -40,6 +40,7 @@
                 else{
                     commText = $(element).closest('.comment-container').find('.card-body:first')
                     $(commText).html(`<h5>${response['text']}</h5>`)
+                    $(element).remove();
                 }
             },
             error: function(xhr) {
@@ -104,6 +105,16 @@
         return htmltemplate;
     }
 
+    function GetThreadRedirectButton(parentId){
+        return `<div class="row row-cols-12">
+            <div class="col-0"></div>
+                <div class="m-2 col">
+                    <a class="btn btn-primary" href="/view_thread/${parentId}">View Full Thread</a>
+                    <hr>
+                </div>
+             </div>`
+    }
+
     function LeaveCommentAjax(event){
         photoId = $('#photoInput').val();
         parentId = $('#parentInput').val();
@@ -142,6 +153,9 @@
                         $(childrenList).append(commentTemplate);
                     }
                     else{
+                        // add to comment children view_thread
+                        childrenList = $(parentComment).find('.comment-children:first')
+                        $(childrenList).append(GetThreadRedirectButton(parentId));
                         $('#toastLink').attr('href', `/view_thread/${parentId}`);
                         $('.toast').toast('show');
                     }

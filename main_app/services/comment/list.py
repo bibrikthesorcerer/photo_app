@@ -1,6 +1,6 @@
 from service_objects.services import ServiceWithResult
 from django import forms
-from django.db.models import QuerySet, Prefetch
+from django.db.models import QuerySet, Prefetch, Q
 from decouple import config
 
 from main_app.services.comment import RetrieveComment
@@ -40,13 +40,15 @@ class ListComments(ServiceWithResult):
         if roots_only:
             objects = objects.filter(parent__isnull=True)
         
-        return objects.filter(deleted_at=None)
+        return objects.filter(Q(deleted_at=None) 
+                              | (Q(text__exact="DELETED") & ~Q(deleted_at=None)))
     
     def _all_comments_query(self) -> QuerySet[Comment]:
         return Comment.objects.all()
     
     def _prefetch_children(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
-        children_query = Comment.objects.filter(deleted_at=None)
+        children_query = Comment.objects.filter(Q(deleted_at=None) 
+                                                | (Q(text__exact="DELETED") & ~Q(deleted_at=None)))
         return objects.prefetch_related(Prefetch('children', queryset=children_query))
     
     def _select_related_user(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:

@@ -10,9 +10,9 @@ from main_app.services import CreateComment, ListThread, DeleteComment, SendComm
 class DeleteCommentView(LoginRequiredMixin, View):
 
     def post(self, request, **kwargs):
-        comment, _is_deleted = DeleteComment.execute({**request.POST.dict()})
+        comment, is_deleted = DeleteComment.execute({**request.POST.dict()})
         data = CommentSerializer(comment).data
-        data.update({'is_deleted':_is_deleted})
+        data.update({'is_deleted':is_deleted})
         return JsonResponse(data)
 
 
