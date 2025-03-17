@@ -47,7 +47,7 @@ class CreateComment(ServiceWithResult):
         parent_id = self.cleaned_data.get('parent_id')
         if not parent_id:
             return None
-        return RetrieveComment.execute({'pk': parent_id})
+        return RetrieveComment.execute({'comment_id': parent_id})
     
     def _get_related_photo(self) -> Photo:
         photo_id = self.cleaned_data.get('photo_id')

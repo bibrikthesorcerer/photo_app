@@ -23,8 +23,52 @@
 		</div>
 </div>
 
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5">Edit Comment</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="editCommentForm">
+				<div class="modal-body">
+						<div class="mb-3">
+							<input style="display: none;" id="editingCommentInput" name="comment_id" value="" />
+							<label for="text" class="col-form-label">Text:</label>
+							<textarea name="text" class="form-control" id="editCommentTextInput"></textarea>
+						</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="editCommentModalSave">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
+		editCommentModal = document.getElementById('editCommentModal');
+		editCommentModal.addEventListener('show.bs.modal', function(event) {
+			// get comment id
+			button = event.relatedTarget.closest('.edit-comment-button');
+			comment_id = button.getAttribute('data-id');			
+			
+			// insert current text into modal
+			text = document.getElementById(`commentText${comment_id}`).innerText
+			textInput = document.getElementById('editCommentTextInput');
+			textInput.value = text;
+
+			// insert comment id into hidden input
+			commentInput = document.getElementById('editingCommentInput');
+			commentInput.setAttribute('value', comment_id);
+
+		});
+		editCommentModal.addEventListener('hide.bs.modal', function(event){
+			document.getElementById('editCommentForm').reset();
+		});
+
 		commentModal = document.getElementById('commentModal');
 		commentModal.addEventListener('show.bs.modal', function(event) {
 			
@@ -38,6 +82,10 @@
 			photoInput.setAttribute('value', photo_id);
 			parentInput.setAttribute('value', id);
 		});
+		commentModal.addEventListener('hide.bs.modal', function(event){
+			document.getElementById('commentForm').reset();
+		});
+
 
 		if (window.location.hash.indexOf('#commentModal') > -1){
 			history.replaceState({}, document.title, window.location.href.split('#')[0]);

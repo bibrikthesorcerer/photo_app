@@ -1,6 +1,6 @@
 from service_objects.services import ServiceWithResult
 from django import forms
-from django.db.models import QuerySet, Prefetch
+from django.db.models import QuerySet, Prefetch, Q
 from decouple import config
 
 from main_app.services.comment import RetrieveComment
@@ -40,13 +40,15 @@ class ListComments(ServiceWithResult):
         if roots_only:
             objects = objects.filter(parent__isnull=True)
         
-        return objects.filter(deleted_at=None)
+        return objects.filter(Q(deleted_at=None) 
+                              | (Q(text__exact="DELETED") & ~Q(deleted_at=None)))
     
     def _all_comments_query(self) -> QuerySet[Comment]:
         return Comment.objects.all()
     
     def _prefetch_children(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
-        children_query = Comment.objects.filter(deleted_at=None)
+        children_query = Comment.objects.filter(Q(deleted_at=None) 
+                                                | (Q(text__exact="DELETED") & ~Q(deleted_at=None)))
         return objects.prefetch_related(Prefetch('children', queryset=children_query))
     
     def _select_related_user(self, objects: QuerySet[Comment]) -> QuerySet[Comment]:
@@ -59,10 +61,10 @@ class ListThread(ServiceWithResult):
 
     Parameters
     ----------
-        root_id (int): id of root comment of thread
+        comment_id (int): id of root comment of thread
         max_depth (int, optional): how deep into descendants service should traverse
     """
-    root_id = forms.IntegerField()
+    comment_id = forms.IntegerField()
     max_depth = forms.IntegerField(required=False)
 
     def process(self) -> tuple[dict[Comment, list[dict]], int]:
@@ -70,7 +72,7 @@ class ListThread(ServiceWithResult):
         return self.result
 
     def _read_children_recursively(self, root_id, depth) -> dict[Comment, list[dict]]:
-        comm = RetrieveComment().execute({"pk": root_id,})
+        comm = RetrieveComment().execute({"comment_id": root_id,})
         children = comm.children.all() # only non-deleted children are prefetched
         
         if not children:
@@ -90,6 +92,6 @@ class ListThread(ServiceWithResult):
         return {comm: ancestors}
 
     def _read_thread(self) -> dict[Comment, list[dict]]:
-        root_id = self.cleaned_data.get('root_id')
+        root_id = self.cleaned_data.get('comment_id')
         self.max_depth = self.cleaned_data.get('max_depth') or config('THREAD_MAX_DEPTH', cast=int)
         return self._read_children_recursively(root_id, 0)

@@ -5,3 +5,4 @@ from .like.models import Like
 from .photo.models import Photo
 from .photo_version.models import PhotoVersion
 from .user_profile.models import UserProfile
+from .review_ticket.models import ReviewTicket

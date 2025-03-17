@@ -15,9 +15,10 @@ from notifications.utils import send_message_to_list_of_users
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ["title", "admin_thumbnail", "user", "status", "moderation"]
-    search_fields = list_display + ["description"]
+    search_fields = ["title", "description"]
     admin_thumbnail = AdminThumbnail(image_field="admin_thumbnail")
     readonly_fields = ["status", "pub_date"]
+    list_filter = ["status", "user", "pub_date", "updated_at", "created_at"]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -62,15 +63,16 @@ class PhotoAdmin(admin.ModelAdmin):
                                 "admin/models_app/photo/moderate_photo.html",
                                 context)
 
-    def approve_view(self, request, *args, **kwargs):
+    def approve_view(self, request, *args, **kwargs):        
         photo_obj = RetrievePhoto.execute(kwargs)
         if photo_obj.status != Photo.ON_MODERATION:
             self.message_user(request,
                               f"Photo {photo_obj.id} is not in need of moderation.",
                               level=messages.WARNING)
             return redirect("admin:index")
+        
         flow = PhotoModerationFlow(photo_obj)
-        flow.approve()
+        flow.approve(moderator=request.user)
         send_message_to_list_of_users(
             [photo_obj.user.id],
             "send_notification",
@@ -80,18 +82,24 @@ class PhotoAdmin(admin.ModelAdmin):
         return redirect("admin:index")
 
     def deny_view(self, request, *args, **kwargs):
+        if request.method != "POST":
+            self.message_user(request, "Only POST requests are acceptable.")
+            return redirect("admin:index")
+        
         photo_obj = RetrievePhoto.execute(kwargs)
         if photo_obj.status != Photo.ON_MODERATION:
             self.message_user(request,
                               f"Photo {photo_obj.id} is not in need of moderation.",
                               level=messages.WARNING)
             return redirect("admin:index")
+        
         flow = PhotoModerationFlow(photo_obj)
-        flow.deny()
+        flow.deny(**(request.POST.dict() 
+                     | {'moderator': request.user}))
         send_message_to_list_of_users(
             [photo_obj.user.id],
             "send_notification",
-            f"Your photo titled '{photo_obj.title}' had been denied"
+            f"Your photo titled '{photo_obj.title}' had been denied. Commentary: '{flow.review_ticket.commentary}'"
         )
         self.message_user(request, "Selected photo denied.")
         return redirect("admin:index")

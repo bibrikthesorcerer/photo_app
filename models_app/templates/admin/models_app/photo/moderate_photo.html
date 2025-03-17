@@ -13,11 +13,26 @@
 
 {% block content_title %}
 <h1>Moderate Photo #{{photo.id}}</h1> 
-<ul style="margin: 3% auto 3%;">
-<a class="button" href="{% url 'admin:approve' photo_id=photo.id %}">Approve</a>
-<a class="button" href="{% url 'admin:deny' photo_id=photo.id %}">Deny</a>
-</ul>
-
+<div style="margin-bottom: 3%;">
+    <h1>Approve:</h1>
+    <a class="button" style="padding: 15px;"
+        href="{% url 'admin:approve' photo_id=photo.id %}">
+            Confirm Approval
+    </a>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-top: 20px;">
+            <h1>Deny with commentary:</h1>
+            <textarea id="commentary" name="commentary" rows="4" cols="25" required></textarea>
+        </div>
+        <div style="margin-top: 20px;">   
+            <button type="submit" class="button" style="padding: 15px;"
+            formaction="{% url 'admin:deny' photo_id=photo.id %}">
+                Confirm Denial
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -47,9 +62,11 @@
         <thead>
         <tr>
             <td></td>
+            <td>Iteration</td>
             <td>Title</td>
             <td>Description</td>
-            <td>Iteration</td>
+            <td>Review result</td>
+            <td>Review commentary</td>
             <td>Created at</td>
         </tr>
         </thead>
@@ -57,9 +74,19 @@
         {% for version in versions %}
             <tr>
                 <td><img src="{{ version.img.url }}" style="max-height: 30vh; max-width: 50vw;"></td>
+                <td>{{ version.iteration }}</td>
                 <td>{{ version.title }}</td>
                 <td>{{ version.description }}</td>
-                <td>{{ version.iteration }}</td>
+                {% for ticket in version.review_tickets.all%}
+                    <td>{{ticket.result}}</td>
+                    <td>
+                        {% if ticket.result == photo.DENIED %}
+                            {{ticket.commentary}}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    {% endfor %}
                 <td>{{ version.created_at }}</td>
             </tr>
         {% endfor %}

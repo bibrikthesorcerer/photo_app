@@ -4,15 +4,17 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from main_app.serializers.comment import CommentSerializer
-from main_app.services import CreateComment, ListThread, DeleteComment, SendCommentNotification
+from main_app.services import (CreateComment, ListThread, 
+                               DeleteComment, SendCommentNotification, 
+                               EditCommentText)
 
 
 class DeleteCommentView(LoginRequiredMixin, View):
 
     def post(self, request, **kwargs):
-        comment, _is_deleted = DeleteComment.execute({**request.POST.dict()})
+        comment, is_deleted = DeleteComment.execute({**request.POST.dict()})
         data = CommentSerializer(comment).data
-        data.update({'is_deleted':_is_deleted})
+        data.update({'is_deleted':is_deleted})
         return JsonResponse(data)
 
 
@@ -43,3 +45,11 @@ class ViewThread(View):
         }
         
         return render(request, self.template_name, context)
+    
+
+class EditCommentView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        comment = EditCommentText.execute({**request.POST.dict()})
+        data = CommentSerializer(comment).data
+        return JsonResponse(data)

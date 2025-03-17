@@ -14,7 +14,8 @@ urlpatterns = [
     path('recover_photo/<int:photo_id>', views.RecoverPhoto.as_view(), name='recover_photo'),
     path('create_like/', views.CreateLike.as_view(), name='create_like'),
     path('remove_like/', views.RemoveLike.as_view(), name='remove_like'),
-    path('view_thread/<int:root_id>', views.ViewThread.as_view(), name='view_thread'),
+    path('view_thread/<int:comment_id>', views.ViewThread.as_view(), name='view_thread'),
     path('leave_comment/', views.LeaveCommentView.as_view(), name='leave_comment'),
     path('delete_comment/', views.DeleteCommentView.as_view(), name='delete_comment'),
+    path('edit_comment/', views.EditCommentView.as_view(), name='edit_comment'),
 ]

@@ -1,1 +1,1 @@
-from .views import DeleteCommentView, LeaveCommentView, ViewThread
+from .views import DeleteCommentView, LeaveCommentView, ViewThread, EditCommentView

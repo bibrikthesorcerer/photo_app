@@ -7,8 +7,9 @@ import pathlib
 
 from main_app.tasks import delete_photo_by_id
 from models_app.admin.photo.forms import PhotoForm
-from models_app.models import Photo, UserProfile
-from main_app.services.photo_version.create import CreatePhotoVersion
+from models_app.models import Photo
+from main_app.services.review_ticket import UpdateReviewTicketWithVersion
+from main_app.services.photo_version import CreatePhotoVersion
 
 
 class ManageOldImage(ServiceWithResult):
@@ -74,13 +75,25 @@ class RecoverPhotoBeforeDeletion(ServiceWithResult):
             self.result = False
             return self.result
         
-        photo_obj.status = Photo.ON_MODERATION
+        # get review ticket associated with photo
+        ticket = photo_obj.review_tickets.first()
+        photo_obj.status = ticket.result if ticket else Photo.ON_MODERATION
         photo_obj.save()
         self.result = True
         return self.result
 
 
 class UpdatePhoto(ServiceWithResult):
+    """
+    Updates Photo object, creates PhotoVersion to archive last state of Photo.
+
+    Parameters
+    ----------
+        title (str, optional): new title
+        description (str, optional): new description
+        img (Image, optional): new Image file
+        photo (Photo): an object being archived
+    """
     title = forms.CharField(max_length=64,required=False)
     description = forms.CharField(max_length=256,required=False)
     img = forms.ImageField(required=False)
@@ -100,7 +113,13 @@ class UpdatePhoto(ServiceWithResult):
         form = PhotoForm(*self._collect_form_data(), instance=deepcopy(photo))
         self.result = None
         if form.is_valid():
-            CreatePhotoVersion.execute({"photo_id":photo.id})
+            version = CreatePhotoVersion.execute({"photo_id":photo.id})
+            UpdateReviewTicketWithVersion.execute({
+                "photo_id": photo.id,
+                "photo_version_id": version.id
+            })
             ManageOldImage.execute({"new_photo":form.instance, "old_photo": photo})
+            form.instance.status = Photo.ON_MODERATION
+            form.instance.pub_date = None
             self.result = form.save()
         return self.result
