@@ -29,9 +29,7 @@ class Photo(BaseModel):
     # like_set
     # comment_set
     # photoversion_set
-    user = models.ForeignKey(
-        "models_app.UserProfile", on_delete=models.SET_NULL, null=True
-    )
+    user = models.ForeignKey("models_app.UserProfile", on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     pub_date = models.DateTimeField(null=True, default=None, blank=True)

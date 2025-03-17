@@ -120,5 +120,6 @@ class UpdatePhoto(ServiceWithResult):
             })
             ManageOldImage.execute({"new_photo":form.instance, "old_photo": photo})
             form.instance.status = Photo.ON_MODERATION
+            form.instance.pub_date = None
             self.result = form.save()
         return self.result
