@@ -9,14 +9,13 @@ class DeleteComment(ServiceWithResult):
     comment_id = forms.IntegerField()
 
     def process(self) -> tuple[Comment, bool]:
-        comment_id = self.cleaned_data.get('comment_id')
-        comment_obj = RetrieveComment.execute({"pk": comment_id})
+        comment_obj = RetrieveComment.execute({**self.cleaned_data})
         is_deleted = False
         if comment_obj.children.all():
             comment_obj.text = 'DELETED'
             comment_obj.save()
         else:
             is_deleted = True
-        comment_obj = Comment.objects.filter(id=comment_id).delete().first()
+        comment_obj = Comment.objects.filter(id=comment_obj.id).delete().first()
         self.result = (comment_obj, is_deleted)
         return self.result

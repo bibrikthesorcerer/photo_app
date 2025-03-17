@@ -4,7 +4,9 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from main_app.serializers.comment import CommentSerializer
-from main_app.services import CreateComment, ListThread, DeleteComment, SendCommentNotification
+from main_app.services import (CreateComment, ListThread, 
+                               DeleteComment, SendCommentNotification, 
+                               EditCommentText)
 
 
 class DeleteCommentView(LoginRequiredMixin, View):
@@ -43,3 +45,11 @@ class ViewThread(View):
         }
         
         return render(request, self.template_name, context)
+    
+
+class EditCommentView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        comment = EditCommentText.execute({**request.POST.dict()})
+        data = CommentSerializer(comment).data
+        return JsonResponse(data)

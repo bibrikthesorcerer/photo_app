@@ -10,9 +10,9 @@ class RetrieveComment(ServiceWithResult):
 
       Parameters
       ----------
-            pk (int): primary key of an object being retrieved
+            comment_id (int): primary key of an object being retrieved
       """
-    pk = forms.IntegerField()
+    comment_id = forms.IntegerField()
 
     def process(self):
         objects = self._all_comments_query()
@@ -26,8 +26,8 @@ class RetrieveComment(ServiceWithResult):
         return Comment.objects.all()
     
     def _get_data(self, objects: QuerySet) -> Comment:
-        pk = self.cleaned_data.get('pk')
-        return objects.get(pk=pk)
+        comment_id = self.cleaned_data.get('comment_id')
+        return objects.get(pk=comment_id)
     
     def _prefetch_children(self, objects: QuerySet) -> QuerySet:
         children_query = Comment.objects.filter(Q(deleted_at=None) 

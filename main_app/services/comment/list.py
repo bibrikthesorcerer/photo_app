@@ -61,10 +61,10 @@ class ListThread(ServiceWithResult):
 
     Parameters
     ----------
-        root_id (int): id of root comment of thread
+        comment_id (int): id of root comment of thread
         max_depth (int, optional): how deep into descendants service should traverse
     """
-    root_id = forms.IntegerField()
+    comment_id = forms.IntegerField()
     max_depth = forms.IntegerField(required=False)
 
     def process(self) -> tuple[dict[Comment, list[dict]], int]:
@@ -72,7 +72,7 @@ class ListThread(ServiceWithResult):
         return self.result
 
     def _read_children_recursively(self, root_id, depth) -> dict[Comment, list[dict]]:
-        comm = RetrieveComment().execute({"pk": root_id,})
+        comm = RetrieveComment().execute({"comment_id": root_id,})
         children = comm.children.all() # only non-deleted children are prefetched
         
         if not children:
@@ -92,6 +92,6 @@ class ListThread(ServiceWithResult):
         return {comm: ancestors}
 
     def _read_thread(self) -> dict[Comment, list[dict]]:
-        root_id = self.cleaned_data.get('root_id')
+        root_id = self.cleaned_data.get('comment_id')
         self.max_depth = self.cleaned_data.get('max_depth') or config('THREAD_MAX_DEPTH', cast=int)
         return self._read_children_recursively(root_id, 0)

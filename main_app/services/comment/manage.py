@@ -2,9 +2,10 @@ from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
 from django import forms
 
-from models_app.models import Photo, UserProfile
+from models_app.models import Photo, UserProfile, Comment
 from main_app.services import RetrievePhoto
 from main_app.services.comment.list import ListComments
+from main_app.services.comment.retrieve import RetrieveComment
 from notifications.utils import send_message_to_list_of_users
 
 
@@ -36,6 +37,13 @@ class SendCommentNotification(ServiceWithResult):
         )
 
 class SendCommentWillBeDeletedNotification(ServiceWithResult):
+    """
+    Sends notification to all users who left comments under a photo scheduled for deletion
+
+    Parameters
+    ----------
+        photo (Photo): Photo scheduled to be deleted
+    """
     photo = ModelField(Photo)
 
     def process(self) -> None:
@@ -47,3 +55,22 @@ class SendCommentWillBeDeletedNotification(ServiceWithResult):
             'send_notification',
             f"Photo '{photo_obj.title}' which you had commented is scheduled to be deleted with all comments you have left.",
         )
+
+class EditCommentText(ServiceWithResult):
+    """
+    Edits comment by changing text
+
+    Parameters
+    ----------
+        comment_id (int): id of comment being edited
+        text (str):  new text
+    """
+    comment_id = forms.IntegerField()
+    text = forms.CharField()
+
+    def process(self) -> Comment:
+        comment_obj = RetrieveComment.execute({**self.cleaned_data})
+        comment_obj.text = self.cleaned_data.get('text')
+        comment_obj.save()
+        self.result = comment_obj
+        return self.result
