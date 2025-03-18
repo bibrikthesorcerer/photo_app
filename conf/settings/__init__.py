@@ -4,4 +4,5 @@ include(
     './django.py',
     './database.py',
     './celery.py',
+    './logging.py',
 )
