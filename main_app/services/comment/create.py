@@ -43,7 +43,7 @@ class CreateComment(ServiceWithResult):
         
         return self.result
     
-    def _get_parent_comment(self) -> Comment:
+    def _get_parent_comment(self) -> Comment|None:
         parent_id = self.cleaned_data.get('parent_id')
         if not parent_id:
             return None

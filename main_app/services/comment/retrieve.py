@@ -1,38 +1,46 @@
-from service_objects.services import ServiceWithResult
 from django import forms
-from django.db.models import QuerySet, Prefetch, Q
+from django.db.models import Prefetch
+from django.db.models import Q
+from service_objects.services import ServiceWithResult
 
 from models_app.models.comment.models import Comment
 
+
 class RetrieveComment(ServiceWithResult):
     """
-      Retrieves Comment object with info about user and children comments
+    Retrieves Comment object with info about user and children comments
 
-      Parameters
-      ----------
-            comment_id (int): primary key of an object being retrieved
-      """
+    Parameters
+    ----------
+          comment_id (int): primary key of an object being retrieved
+    """
+
     comment_id = forms.IntegerField()
 
-    def process(self):
-        objects = self._all_comments_query()
-        objects = self._prefetch_children(objects)
-        objects = self._select_related_user(objects)
-        objects = self._get_data(objects)
-        self.result = objects
+    def process(self) -> Comment:
+        self.result = self._get_comment_instance()
         return self.result
-    
-    def _all_comments_query(self) -> QuerySet:
-        return Comment.objects.all()
-    
-    def _get_data(self, objects: QuerySet) -> Comment:
-        comment_id = self.cleaned_data.get('comment_id')
-        return objects.get(pk=comment_id)
-    
-    def _prefetch_children(self, objects: QuerySet) -> QuerySet:
-        children_query = Comment.objects.filter(Q(deleted_at=None) 
-                                                | (Q(text__exact="DELETED") & ~Q(deleted_at=None)))
-        return objects.prefetch_related(Prefetch('children', queryset=children_query))
-    
-    def _select_related_user(self, objects: QuerySet) -> QuerySet:
-        return objects.select_related('user')
+
+    def _get_comment_instance(self) -> Comment:
+        self._get_comments_manager()
+        self._add_extra_params()
+        comment_id = self.cleaned_data.get("comment_id")
+        return self.objects.get(pk=comment_id)
+
+    def _add_extra_params(self):
+        self._prefetch_children()
+        self._select_related_user()
+
+    def _get_comments_manager(self):
+        self.objects = Comment.objects
+
+    def _prefetch_children(self):
+        children_query = Comment.objects.filter(
+            Q(deleted_at=None) | (Q(text__exact="DELETED") & ~Q(deleted_at=None))
+        )
+        self.objects = self.objects.prefetch_related(
+            Prefetch("children", queryset=children_query)
+        )
+
+    def _select_related_user(self):
+        self.objects = self.objects.select_related("user")

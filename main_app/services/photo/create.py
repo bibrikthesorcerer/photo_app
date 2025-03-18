@@ -1,3 +1,4 @@
+from typing import Any
 from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
 from django import forms
@@ -13,7 +14,7 @@ class CreatePhoto(ServiceWithResult):
     description = forms.CharField(max_length=256)
     img = forms.ImageField()
 
-    def _collect_form_data(self) -> dict[str, str]:
+    def _collect_form_data(self) -> tuple[dict[str, Any],dict[str, Any]]:
         post = {
             "title": self.cleaned_data.get("title"),
             "description": self.cleaned_data.get("description"),

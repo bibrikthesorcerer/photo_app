@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Any
 from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
 from decouple import config
@@ -99,7 +100,7 @@ class UpdatePhoto(ServiceWithResult):
     img = forms.ImageField(required=False)
     photo = ModelField(Photo)
 
-    def _collect_form_data(self) -> dict[str, str]:
+    def _collect_form_data(self) -> tuple[dict[str, Any],dict[str, Any]]:
         post = {
             "title": self.cleaned_data.get("title"),
             "description": self.cleaned_data.get("description"),
