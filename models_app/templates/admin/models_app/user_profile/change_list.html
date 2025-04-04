@@ -1,0 +1,57 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<div id="messageModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--body-bg);
+    padding: 20px;
+    z-index: 1000;
+    border: 5px solid var(--header-bg);
+    ">
+    <h3>Message text:</h3>
+    <form id="messageForm">
+        {% csrf_token %}
+        <textarea name="notification_message" rows="4" cols="50" style="margin-bottom: 10px;"></textarea>
+        <div>
+            <button type="submit" class="button">Send</button>
+            <button type="button" onclick="document.getElementById('messageModal').style.display = 'none'" class="button">Cancel</button>
+        </div>
+    </form>
+</div>
+
+{{ block.super }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const actionForm = document.getElementById('changelist-form');
+    const modal = document.getElementById('messageModal');
+    const messageForm = document.getElementById('messageForm');
+
+    actionForm.addEventListener('submit', function(e) {
+        if (document.querySelector('[name="action"]').value === 'send_notification') {
+            e.preventDefault();
+            modal.style.display = 'block';
+        }
+    });
+
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = document.querySelector('[name="notification_message"]').value;
+        
+        //add hidden input for message in actionForm
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'message';
+        input.value = message;
+        actionForm.appendChild(input);
+        
+        // submit actionForm
+        actionForm.submit();
+    });
+});
+</script>
+{% endblock %}
