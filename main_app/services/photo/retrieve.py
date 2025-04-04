@@ -26,41 +26,45 @@ class RetrievePhoto(ServiceWithResult):
     user = ModelField(UserProfile, required=False)
 
     def process(self) -> Photo:
-        objects = self._all_photos_query()
-        objects = self._count_likes_and_comments(objects)
-        objects = self._select_related_user(objects)
-        objects = self._prefetch_related(objects)
-        objects = self._is_liked_by_user(objects)
-        self.result = self._get_photo_instance(objects)
+        self.result = self._get_photo_instance()
         return self.result
 
-    def _get_photo_instance(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
+    def _get_photo_instance(self) -> Photo:
+        self._get_photos_manager()
+        self._add_extra_params()
         pk = self.cleaned_data.get("photo_id")
-        return objects.get(pk=pk)
+        return self.objects.get(pk=pk)
 
-    def _all_photos_query(self):
-        return Photo.objects.all()
+    def _get_photos_manager(self):
+        self.objects = Photo.objects
+    
+    def _add_extra_params(self):
+        self._count_likes_and_comments()
+        self._select_related_user()
+        self._prefetch_related()
+        self._is_liked_by_user()
 
-    def _is_liked_by_user(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
+
+    def _is_liked_by_user(self):
         user = self.cleaned_data.get("user")
         if not user:
-            return objects
+            return
 
         like_subquery = Like.objects.filter(
             photo=OuterRef("pk"), user=user, deleted_at=None
         )
-        return objects.annotate(is_liked=Exists(like_subquery))
+        self.objects = self.objects.annotate(is_liked=Exists(like_subquery))
 
-    def _count_likes_and_comments(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
-        return objects.annotate(
+    def _count_likes_and_comments(self):
+        self.objects = self.objects.annotate(
             likes_count=Count("like", filter=Q(like__deleted_at=None), distinct=True),
             comments_count=Count(
                 "comment", filter=Q(comment__deleted_at=None), distinct=True
             ),
         )
 
-    def _select_related_user(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
-        return objects.select_related("user")
+    def _select_related_user(self):
+        self.objects = self.objects.select_related("user")
 
-    def _prefetch_related(self, objects: QuerySet[Photo]) -> QuerySet[Photo]:
-        return objects.prefetch_related("review_tickets")
+    def _prefetch_related(self):
+        self.objects = self.objects.prefetch_related("review_tickets")

@@ -42,25 +42,26 @@ class ListPhotos(ServiceWithResult):
     order = forms.ChoiceField(choices=ORDER_CHOICES, required=False)
 
     def process(self) -> QuerySet:
-        objects = self._all_photos_query()
-        objects = self._count_likes_and_comments(objects)
-        objects = self._select_related_user(objects)
-        objects = self._is_liked_by_user(objects)                
-        objects = self._apply_filters(objects)
-        objects = self._order_data_by(objects)
-        objects = self._search_for_entry(objects)
-        objects = self._get_paginated_queryset(objects)
-        
-        self.result = objects
+        self.result = self._get_paginated_queryset()
         return self.result
 
-    def _all_photos_query(self):
-        return Photo.objects.all()
+    def _get_photos_manager(self):
+        self.objects = Photo.objects
   
-    def _get_paginated_queryset(self, objects: QuerySet) -> QuerySet:
+    def _get_paginated_queryset(self) -> QuerySet:
+        self._get_photos_manager()
+        self._add_extra_params()
         per_page = self.cleaned_data.get('per_page') or config('PHOTOS_PER_PAGE', cast=int)
         page = self.cleaned_data.get('page')
-        return Paginator(objects, per_page).get_page(page)
+        return Paginator(self.objects, per_page).get_page(page)
+    
+    def _add_extra_params(self):
+        self._count_likes_and_comments()
+        self._select_related_user()
+        self._is_liked_by_user()
+        self._apply_filters()
+        self._order_data_by()
+        self._search_for_entry()
     
     def _build_filters(self) -> Q:
         filters = Q()
@@ -71,14 +72,14 @@ class ListPhotos(ServiceWithResult):
 
         return filters
 
-    def _apply_filters(self, objects: QuerySet) -> QuerySet:        
-        return objects.filter(self._build_filters())
+    def _apply_filters(self):        
+        self.objects = self.objects.filter(self._build_filters())
 
-    @validate_param('user')
-    def _is_liked_by_user(self, objects: QuerySet, user) -> QuerySet:
-        # user = self.cleaned_data.get('user')
-        # if not user:
-        #         return objects
+    # @validate_param('user')
+    def _is_liked_by_user(self):
+        user = self.cleaned_data.get('user')
+        if not user:
+                return
         
         like_subquery = Like.objects.filter(
                 photo=OuterRef('pk'),
@@ -86,35 +87,32 @@ class ListPhotos(ServiceWithResult):
                 deleted_at=None
         )
         
-        return objects.annotate(is_liked=Exists(like_subquery))
+        self.objects = self.objects.annotate(is_liked=Exists(like_subquery))
 
-    @validate_param('entry')
-    def _search_for_entry(self, objects: QuerySet, entry) -> QuerySet:
-        # entry = self.cleaned_data.get('entry')
-        # if not entry:
-        #         return objects
+    # @validate_param('entry')
+    def _search_for_entry(self):
+        entry = self.cleaned_data.get('entry')
+        if not entry:
+                return
         
-        return objects.filter(
+        self.objects = self.objects.filter(
                 Q(title__icontains=entry) | 
                 Q(description__icontains=entry) | 
                 Q(user__username__icontains=entry)
                 )
 
-    @validate_param('order')
-    def _order_data_by(self, objects: QuerySet, ordering) -> QuerySet:
-        # ordering = self.cleaned_data.get('order')
-        # if not ordering:
-        #         return objects
+    # @validate_param('order')
+    def _order_data_by(self):
+        ordering = self.cleaned_data.get('order')
+        if not ordering:
+                return
         
-        return objects.order_by(ordering)
+        self.objects = self.objects.order_by(ordering)
 
-    def _first_object(self, objects: QuerySet) -> QuerySet:
-        return objects.first()
-
-    def _count_likes_and_comments(self, objects: QuerySet) -> QuerySet:
-        return objects.annotate(
+    def _count_likes_and_comments(self):
+        self.objects = self.objects.annotate(
                 likes_count=Count('like', filter=Q(like__deleted_at=None), distinct=True), 
                 comments_count=Count('comment', filter=Q(comment__deleted_at=None), distinct=True))
 
-    def _select_related_user(self, objects: QuerySet) -> QuerySet:
-        return objects.select_related('user')
+    def _select_related_user(self):
+        self.objects = self.objects.select_related('user')
