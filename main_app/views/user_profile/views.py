@@ -58,7 +58,6 @@ class UserProfileView(LoginRequiredMixin, View):
         
         return self.get(request, *args, **kwargs)
     
-<<<<<<< HEAD
 
 class UserSignupView(View):
     template_name='registration/signup.html'
@@ -138,7 +137,7 @@ class VerifyPasswordView(View):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("main_app:profile")
         return render(request, self.template_name, {"form": form, "validlink": self.validlink})
-=======
+
 class GenerateUserAPIToken(LoginRequiredMixin, View):
     login_url='/login/github'
     
@@ -148,4 +147,3 @@ class GenerateUserAPIToken(LoginRequiredMixin, View):
             'token': str(token),
             'created': token.created
         })
->>>>>>> cddf462 (added APItoken support with JWT and Redis)

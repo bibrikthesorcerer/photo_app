@@ -5,4 +5,5 @@ include(
     './database.py',
     './celery.py',
     './logging.py',
+    './swagger.py'
 )

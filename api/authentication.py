@@ -14,22 +14,25 @@ class RedisJWTAuth(authentication.BaseAuthentication):
         
     def _parse_header(self, request):
         header = request.META.get('HTTP_AUTHORIZATION')
-        if header is None:
+        if not header:
             return None
         
         header_parts = header.split()
         if len(header_parts) == 0:
             # Empty AUTHORIZATION header sent
-            return None
+            raise exceptions.AuthenticationFailed(
+                "Credentials were not provided"
+            )
 
         if header_parts[0] != "Bearer":
             # Assume the header does not contain a JSON web token
-            return None
+            raise exceptions.AuthenticationFailed(
+                "Expected JWT is Authorization header"
+            )
 
         if len(header_parts) != 2:
             raise exceptions.AuthenticationFailed(
-                ("Authorization header must contain two space-delimited values"),
-                code="bad_authorization_header",
+                "Authorization header must contain two space-delimited values"
             )
 
         return header_parts[1]
