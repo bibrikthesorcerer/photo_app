@@ -1,5 +1,5 @@
 {% extends 'main_app/base.html' %}
-
+{% load static %}
 {% block head %}
 <title>Profile | PhotoApp</title>
 {% endblock %}
@@ -11,7 +11,10 @@
           <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="true">Profile</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-tab-pane" type="button" role="tab" aria-controls="edit-tab-pane" aria-selected="false">Edit</button>
+          <button class="nav-link" id="token-tab" data-bs-toggle="tab" data-bs-target="#token-tab-pane" type="button" role="tab" aria-controls="token-tab-pane" aria-selected="false">API Token</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-tab-pane" type="button" role="tab" aria-controls="edit-tab-pane" aria-selected="false">Edit Profile Info</button>
         </li>
       </ul>
       <div class="tab-content" id="profiletabContent">
@@ -44,6 +47,24 @@
                 <button type="submit" value="Submit" class="btn btn-success my-3">Submit</button>
             </form>
         </div>
+
+        <!-- API tokens-->
+        <div class="tab-pane fade" id="token-tab-pane" role="tabpanel" aria-labelledby="token-tab" tabindex="0">
+            
+          <h3>Manage API Token</h3>
+          <div class="bg-body-tertiary rounded px-3 py-1 d-block fs-3">
+            {% if api_token %}
+              <span id="userAPITokenDate">{{api_token.created}}</span>
+              <code id="userAPIToken">{{api_token}}</code>
+            <button type="submit" value="Submit" class="btn btn-success my-3 token-btn">Reissue API Token</button>
+            {% else %}
+              <span id="userAPITokenDate"></span>
+              <code id="userAPIToken">You have no active token</code>
+            <button type="submit" value="Submit" class="btn btn-success my-3 token-btn">Generate Your API Token</button>
+            {% endif %}
+            <script src="{% static 'main_app/js/token_script.js' %}" csrf_token="{{csrf_token}}"></script>
+          </div>
+      </div>
       </div>
 </div>
 {% endblock %}

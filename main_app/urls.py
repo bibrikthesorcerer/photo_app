@@ -18,4 +18,5 @@ urlpatterns = [
     path('leave_comment/', views.LeaveCommentView.as_view(), name='leave_comment'),
     path('delete_comment/', views.DeleteCommentView.as_view(), name='delete_comment'),
     path('edit_comment/', views.EditCommentView.as_view(), name='edit_comment'),
+    path('generate_token/', views.GenerateUserAPIToken.as_view(), name='generate_token')
 ]

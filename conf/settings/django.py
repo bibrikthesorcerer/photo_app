@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config, Csv
 import os
+from datetime import timedelta
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -33,8 +34,21 @@ INSTALLED_APPS = [
     'django_extensions',
     'viewflow',
     'notifications.apps.NotificationsConfig',
-    'log_request_id'
+    'log_request_id',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'main_app.authentication.RedisJWTAuth'
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=config('ACCESS_TOKEN_LIFETIME', cast=int)),
+}
 
 MIDDLEWARE = [
     'log_request_id.middleware.RequestIDMiddleware',

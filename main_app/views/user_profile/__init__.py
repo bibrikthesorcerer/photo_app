@@ -1,1 +1,1 @@
-from .views import UserProfileView 
+from .views import UserProfileView, GenerateUserAPIToken

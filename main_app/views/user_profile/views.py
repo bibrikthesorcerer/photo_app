@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.views import LoginView
 from service_objects.services import ServiceOutcome
@@ -10,10 +11,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.forms import SetPasswordForm
 
-from models_app.admin.user_profile.forms import UserProfileForm, UserProfileLoginForm
-from main_app.services import ListPhotos, GetUserGithubPFP, UpdateUserProfile, CreateUser, FormAccountLinkEmail, SetPasswordForUser
-from models_app.admin.user_profile.forms import UserProfileCreationForm
-
+from models_app.admin.user_profile.forms import UserProfileForm, UserProfileLoginForm, UserProfileCreationForm
+from main_app.services import ListPhotos, GetUserGithubPFP, UpdateUserProfile, CreateUser, FormAccountLinkEmail, SetPasswordForUser, GetUserAPIToken, IssueNewUserAPIToken
 
 
 from main_app.tokens import account_oauth_link_token_generator
@@ -34,11 +33,17 @@ class UserProfileView(LoginRequiredMixin, View):
             "user" : request.user
         })
 
+        api_token = GetUserAPIToken.execute({
+            "user" : request.user
+        })
+
         context = {
             'params': f'per_page={photos.paginator.per_page}',
             'photos_page': photos,
             'avatar' : avatar_url,
             'form': UserProfileForm(instance=request.user),
+            'api_token': api_token,
+            # 'api_token_iat': datetime.fromtimestamp(api_token['iat']).strftime('%Y-%m-%d %H:%M:%S')
         }
 
         return render(request, self.template_name, context)
@@ -53,6 +58,7 @@ class UserProfileView(LoginRequiredMixin, View):
         
         return self.get(request, *args, **kwargs)
     
+<<<<<<< HEAD
 
 class UserSignupView(View):
     template_name='registration/signup.html'
@@ -132,3 +138,14 @@ class VerifyPasswordView(View):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("main_app:profile")
         return render(request, self.template_name, {"form": form, "validlink": self.validlink})
+=======
+class GenerateUserAPIToken(LoginRequiredMixin, View):
+    login_url='/login/github'
+    
+    def post(self, request):
+        token = IssueNewUserAPIToken.execute({"user":request.user})
+        return JsonResponse({
+            'token': str(token),
+            'created': token.created
+        })
+>>>>>>> cddf462 (added APItoken support with JWT and Redis)

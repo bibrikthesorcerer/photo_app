@@ -9,6 +9,11 @@ from django.contrib.auth.forms import SetPasswordForm
 from models_app.models import UserProfile
 from models_app.admin.user_profile.forms import UserProfileForm
 from main_app.tokens import account_oauth_link_token_generator
+from decouple import config
+from rest_framework_simplejwt.tokens import AccessToken
+from datetime import datetime, timedelta
+
+from main_app.utils.redis import cache_value, retrieve_value, delete_value
 
 
 class GetUserGithubPFP(ServiceWithResult):
@@ -76,3 +81,43 @@ class SetPasswordForUser(ServiceWithResult):
             user = form.save()
         self.result = (user, form)
         return self
+
+class GetUserAPIToken(ServiceWithResult):
+    user = ModelField(UserProfile)
+
+    def process(self):
+        user = self.cleaned_data.get('user')
+        token_str = retrieve_value(f'access_tokens:{user.username}')
+        try:
+            self.result = AccessToken(token_str)
+            self.result.created = datetime.fromtimestamp(self.result['iat']).strftime('%Y-%m-%d %H:%M:%S')
+            return self.result
+        except Exception: # expired token
+            return None
+    
+class IssueNewUserAPIToken(ServiceWithResult):
+    user = ModelField(UserProfile)
+    lifetime = forms.IntegerField(required=False)
+
+    def _clean_old_token(self, user):
+        token = GetUserAPIToken.execute({"user":user})
+        if token is not None:
+            delete_value(f'access_tokens:{user.username}')
+
+    def _generate_new_token(self, user):
+        new_token = AccessToken().for_user(user)
+        lifetime = self.cleaned_data.get('lifetime')
+        if lifetime:
+            new_token.set_exp(
+                from_time=new_token.current_time,
+                lifetime=timedelta(seconds=lifetime)
+            )
+        new_token.created = datetime.fromtimestamp(new_token['iat']).strftime('%Y-%m-%d %H:%M:%S')
+        cache_value(f'access_tokens:{user.username}', str(new_token), )
+        return new_token
+
+    def process(self):
+        user = self.cleaned_data.get('user')
+        self._clean_old_token(user)
+        self.result = self._generate_new_token(user)
+        return self.result
