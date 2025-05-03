@@ -2,13 +2,13 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
-from models_app.models import UserProfile
+from models_app.factories.user_profile.factory import UserProfileFactory
 from main_app.services import IssueNewUserAPIToken
 
 class CurrentUserViewTest(APITestCase):
     def setUp(self):
         self.url = reverse('api:current_user')
-        self.test_user = UserProfile.objects.create_user(username="testuser", password="testuserpass")
+        self.test_user = UserProfileFactory.create()
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
 
     def test_get_current_user_no_authorization_header(self):
