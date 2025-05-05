@@ -1,1 +1,1 @@
-from .views import CommentsView
+from .views import CommentsView, SingleCommentView

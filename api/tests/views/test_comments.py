@@ -65,7 +65,7 @@ class CommentsViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_comment_invalid_inputs_error(self):
+    def test_create_comment_invalid_inputs_error_missing(self):
         response = self.client.post(
             self.url,
             data={
@@ -78,3 +78,20 @@ class CommentsViewTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_comment_invalid_inputs_error_not_found(self):
+        response = self.client.post(
+            self.url,
+            data={
+                "photo_id": 12654165,
+                "parent_id": str(self.comments[0].id),
+                "text": "blahblahblah"
+            },
+            headers= {
+                "Authorization": f"Bearer {self.user_token}"
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+

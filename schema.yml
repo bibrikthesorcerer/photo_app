@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: PhotoApp API
+  version: 1.0.0
+  description: PhotoApp's description
+paths:
+  /api/comments:
+    get:
+      operationId: comments_retrieve
+      tags:
+      - comments
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: comments_create
+      tags:
+      - comments
+      responses:
+        '200':
+          description: No response body
+  /api/comments/{comment_id}:
+    get:
+      operationId: comments_retrieve_2
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: comments_update
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: comments_destroy
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      responses:
+        '204':
+          description: No response body
+  /api/users/current:
+    get:
+      operationId: users_current_retrieve
+      tags:
+      - users
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: users_current_update
+      tags:
+      - users
+      responses:
+        '200':
+          description: No response body
+components: {}

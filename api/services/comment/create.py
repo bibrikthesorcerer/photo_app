@@ -2,7 +2,6 @@ from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
 from rest_framework import status
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
 
 from models_app.models import UserProfile, Comment, Photo
 
@@ -24,11 +23,11 @@ class CreateComment(ServiceWithResult):
 
         except Comment.DoesNotExist:
             self.add_error("parent_id", "Parent comment with given id not found")
-            self.response_status = status.HTTP_400_BAD_REQUEST
+            self.response_status = status.HTTP_404_NOT_FOUND
             self.stop_process()
         except Photo.DoesNotExist:
             self.add_error("photo_id", "Photo with given id not found")
-            self.response_status = status.HTTP_400_BAD_REQUEST
+            self.response_status = status.HTTP_404_NOT_FOUND
             self.stop_process()
         except Exception:
             self.response_status = status.HTTP_400_BAD_REQUEST
