@@ -2,17 +2,18 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
-from models_app.models import Comment
 from models_app.factories.user_profile import UserProfileFactory
-from models_app.factories import CommentFactory, PhotoFactory
+from models_app.factories import CommentFactory, PhotoFactory, ThreadsCommentFactory
 from main_app.services import IssueNewUserAPIToken
 from api.serializers import CommentSerializer
+
 
 class CommentsViewTest(APITestCase):
     def setUp(self):
         self.url = reverse('api:comments')
         self.test_user = UserProfileFactory.create()
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
+        self.thread = ThreadsCommentFactory(create_thread__thread_depth=3)
         self.comments = CommentFactory.create_batch(10)
         self.test_photo = PhotoFactory.create()
 
@@ -34,6 +35,25 @@ class CommentsViewTest(APITestCase):
         ]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['objects'], expected_comments[:4])
+
+    def test_get_comments_as_thread(self):
+        response = self.client.get(
+            self.url,
+            QUERY_STRING=f"id={self.thread.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_comments = [CommentSerializer(self.thread).data]
+
+        def _collect_child_ids(parent):
+            children = []
+            for child in parent.children.all():
+                children.append(CommentSerializer(child).data)
+                children.extend(_collect_child_ids(child))
+            return children
+
+        expected_comments.extend(_collect_child_ids(self.thread))
+        expected_comments = sorted(expected_comments, key=lambda x: x.get('pub_date'), reverse=True)
+        self.assertEqual(response.data['objects'], expected_comments) 
 
     def test_create_comment_success(self):
         response = self.client.post(

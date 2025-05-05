@@ -16,6 +16,7 @@ class ListComments(ServiceWithResult):
     page = forms.IntegerField(required=False)
     per_page = forms.IntegerField(required=False)
     order = forms.ChoiceField(choices=ORDER_CHOICES, initial="-pub_date", required=False)
+    id = forms.IntegerField(required=False)
 
     def process(self) -> Page:
         self.result = self._get_paginated_queryset()
@@ -48,6 +49,8 @@ class ListComments(ServiceWithResult):
             filters.add(Q(photo=self.cleaned_data.get("photo_id")), Q.AND)
         if self.cleaned_data.get("roots_only"):
             filters.add(Q(parent__isnull=True), Q.AND)
+        if self.cleaned_data.get("id"):
+            filters.add(Q(id__in=self._get_thread_ids(self.cleaned_data.get("id"))), Q.AND)
 
         # filter deleted comments
         filters.add((
@@ -63,3 +66,17 @@ class ListComments(ServiceWithResult):
     def _order_objects(self):
         order = self.cleaned_data.get("order") or self.fields["order"].initial
         self.objects = self.objects.order_by(order)
+
+    def _get_thread_ids(self, root_id):
+        thread_ids = [root_id]
+        thread_ids.extend(self._traverse_children_recursively(root_id))
+        return thread_ids
+    
+    def _traverse_children_recursively(self, root_id):
+        children_ids = list(Comment.objects.filter(parent=root_id).values_list("id", flat=True))
+        descendants_ids = []
+        for id in children_ids:
+            # get all children of specific child
+            descendants_ids.extend(self._get_thread_ids(id))
+        children_ids.extend(descendants_ids)
+        return children_ids

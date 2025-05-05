@@ -51,4 +51,8 @@ class ThreadsCommentFactory(CommentFactory):
         if create and kwargs.get("thread_depth") is not None:
             parent_comment = self
             for i in range(kwargs.get("thread_depth")):
-                parent_comment = CommentFactory(parent=parent_comment, photo=parent_comment.photo)
+                parent_comment = CommentFactory(
+                    parent=parent_comment,
+                    photo=parent_comment.photo,
+                    children__num_children=fuzzy.FuzzyInteger(0,3)
+                )
