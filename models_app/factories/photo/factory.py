@@ -11,8 +11,8 @@ class PhotoFactory(factory.django.DjangoModelFactory):
         model = "models_app.Photo"
 
     user = SubFactory(UserProfileFactory)
-    title = fuzzy.FuzzyText(length=64)
-    description = fuzzy.FuzzyText(length=256)
+    title = fuzzy.FuzzyText(length=32)
+    description = fuzzy.FuzzyText(length=128)
     pub_date = fuzzy.FuzzyDateTime(start_dt=timezone.now().replace(year=2024))
     status = fuzzy.FuzzyChoice(
         choices=[x[0] for x in Photo.STATUS_CHOICES],
