@@ -1,3 +1,4 @@
 from .user_profile import *
 from .comment import *
-from .photos import *
+from .photo import *
+from .photo_version import *
