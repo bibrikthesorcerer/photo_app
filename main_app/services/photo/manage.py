@@ -55,7 +55,7 @@ class SchedulePhotoDeletion(ServiceWithResult):
         
         photo_obj.status = Photo.TO_BE_DELETED
         photo_obj.save()
-        delete_photo_by_id.apply_async((photo_obj.id,), countdown=config('PHOTO_DELETION_COUNTDOWN', cast=int))
+        delete_photo_by_id.apply_async((photo_obj.id,), countdown=config('PHOTO_DELETION_COUNTDOWN', default=20, cast=int))
         self.result = True
         return self.result
 

@@ -93,5 +93,5 @@ class ListThread(ServiceWithResult):
 
     def _read_thread(self) -> dict[Comment, list[dict]]:
         root_id = self.cleaned_data.get('comment_id')
-        self.max_depth = self.cleaned_data.get('max_depth') or config('THREAD_MAX_DEPTH', cast=int)
+        self.max_depth = self.cleaned_data.get('max_depth') or config('THREAD_MAX_DEPTH', default=5, cast=int)
         return self._read_children_recursively(root_id, 0)

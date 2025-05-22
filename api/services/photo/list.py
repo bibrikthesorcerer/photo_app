@@ -36,7 +36,7 @@ class ListPhotos(ServiceWithResult):
     def _get_paginated_queryset(self) -> Page:
         self._get_photos_manager()
         self._add_extra_params()
-        per_page = self.cleaned_data.get('per_page') or config('PHOTOS_PER_PAGE', cast=int)
+        per_page = self.cleaned_data.get('per_page') or config('PHOTOS_PER_PAGE', default=20, cast=int)
         page = self.cleaned_data.get('page')
         return Paginator(self.objects, per_page).get_page(page)
     

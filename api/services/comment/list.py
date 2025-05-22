@@ -28,7 +28,7 @@ class ListComments(ServiceWithResult):
         return self._paginate_queryset()
     
     def _paginate_queryset(self) -> Page:
-        per_page = self.cleaned_data.get('per_page') or config('COMMENTS_PER_PAGE', cast=int)
+        per_page = self.cleaned_data.get('per_page') or config('COMMENTS_PER_PAGE', default=20, cast=int)
         page = self.cleaned_data.get('page')
         return Paginator(self.objects, per_page).get_page(page)
     

@@ -31,7 +31,7 @@ class PhotosViewTest(APITestCase):
                 comments_count=Count('comment', filter=Q(comment__deleted_at=None), distinct=True))
         
         expected_photos = PageSerializer(
-            instance=Paginator(expected_photos, config('PHOTOS_PER_PAGE', cast=int)).get_page(None),
+            instance=Paginator(expected_photos, config('PHOTOS_PER_PAGE', default=20, cast=int)).get_page(None),
             objects_serializer=PhotoSerializer
             )
         self.assertEqual(response.data['objects'], expected_photos.data['objects'])
