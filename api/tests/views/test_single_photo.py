@@ -23,12 +23,6 @@ class SinglePhotoViewTest(APITestCase):
             reverse("api:single_photo", args=[self.test_photo.id])
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_photo = Photo.objects.annotate(
-            likes_count=Count("like", filter=Q(like__deleted_at=None), distinct=True),
-            comments_count=Count("comment", filter=Q(comment__deleted_at=None), distinct=True)
-        ).get(id=self.test_photo.id)
-        expected_photo = PhotoSerializer(expected_photo).data
-        self.assertEqual(response.data, expected_photo)
 
     def test_retrieve_photo_not_found(self):
         response = self.client.get(

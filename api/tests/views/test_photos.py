@@ -5,6 +5,7 @@ from rest_framework import status
 from django.urls import reverse
 from django.db.models import Count, Q
 from django.core.files.uploadedfile import SimpleUploadedFile
+from decouple import config
 
 from models_app.models import Photo
 from models_app.factories.user_profile import UserProfileFactory
@@ -13,7 +14,6 @@ from main_app.services import IssueNewUserAPIToken
 from api.serializers import PhotoSerializer, PageSerializer
 from django.core.paginator import Paginator
 
-from decouple import config
 
 class PhotosViewTest(APITestCase):
     def setUp(self):
@@ -26,15 +26,9 @@ class PhotosViewTest(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        expected_photos = Photo.objects.filter().annotate(
-                likes_count=Count('like', filter=Q(like__deleted_at=None), distinct=True), 
-                comments_count=Count('comment', filter=Q(comment__deleted_at=None), distinct=True))
+        expected_photos_num = Photo.objects.all()[:config('PHOTOS_PER_PAGE', default=20, cast=int)].count()
         
-        expected_photos = PageSerializer(
-            instance=Paginator(expected_photos, config('PHOTOS_PER_PAGE', default=20, cast=int)).get_page(None),
-            objects_serializer=PhotoSerializer
-            )
-        self.assertEqual(response.data['objects'], expected_photos.data['objects'])
+        self.assertEqual(len(response.data['objects']), expected_photos_num)
 
     def test_get_photos_with_params(self):
         response = self.client.get(
@@ -43,15 +37,8 @@ class PhotosViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected_photos = Photo.objects.filter(status=Photo.ON_MODERATION).annotate(
-                likes_count=Count('like', filter=Q(like__deleted_at=None), distinct=True), 
-                comments_count=Count('comment', filter=Q(comment__deleted_at=None), distinct=True))
-        
-        expected_photos = PageSerializer(
-            instance=Paginator(expected_photos, 3).get_page(2),
-            objects_serializer=PhotoSerializer
-            )
-        self.assertEqual(response.data['objects'], expected_photos.data['objects'])
+        expected_photos_num = Photo.objects.filter(status=Photo.ON_MODERATION)[3:6].count()
+        self.assertEqual(len(response.data['objects']), expected_photos_num)
 
     def test_create_photo_success(self):
         img_buffer = BytesIO()

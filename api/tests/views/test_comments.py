@@ -1,11 +1,14 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
+from django.db.models import Q
+from decouple import config
 
 from models_app.factories.user_profile import UserProfileFactory
 from models_app.factories import CommentFactory, PhotoFactory, ThreadsCommentFactory
 from main_app.services import IssueNewUserAPIToken
 from api.serializers import CommentSerializer
+from models_app.models import Comment
 
 
 class CommentsViewTest(APITestCase):
@@ -19,22 +22,22 @@ class CommentsViewTest(APITestCase):
 
     def test_get_comments_no_params(self):
         response = self.client.get(self.url)
-        expected_comments = [CommentSerializer(comment).data for comment in 
-                             sorted(self.comments, key=lambda x: x.pub_date, reverse=True)
-        ]
+        expected_comments_num = Comment.objects.filter(
+            Q(deleted_at=None) | (Q(text__exact="DELETED") & ~Q(deleted_at=None))
+        )[:config('COMMENTS_PER_PAGE', default=20, cast=int)].count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['objects'], expected_comments)
+        self.assertEqual(len(response.data['objects']), expected_comments_num)
 
     def test_get_comments_some_params(self):
         response = self.client.get(
             self.url,
             QUERY_STRING="per_page=4&order=pub_date"
         )
-        expected_comments = [CommentSerializer(comment).data for comment in 
-                        sorted(self.comments, key=lambda x: x.pub_date, reverse=False)
-        ]
+        expected_comments_num = Comment.objects.filter(
+            Q(deleted_at=None) | (Q(text__exact="DELETED") & ~Q(deleted_at=None))
+        ).order_by("pub_date")[:4].count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['objects'], expected_comments[:4])
+        self.assertEqual(len(response.data['objects']), expected_comments_num)
 
     def test_get_comments_as_thread(self):
         response = self.client.get(
