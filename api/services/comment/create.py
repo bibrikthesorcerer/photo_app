@@ -1,5 +1,6 @@
 from service_objects.services import ServiceWithResult
 from service_objects.fields import ModelField
+from service_objects.errors import Error
 from rest_framework import status
 from django import forms
 
@@ -18,15 +19,20 @@ class CreateComment(ServiceWithResult):
         try:
             if self.parent_comment is not None \
                 and self.parent_comment.photo_id != self.related_photo.id:
-                self.add_error(None, "Parent comment's photo id and photo_id must match")
+                self.add_error(None,
+                               Error(
+                                   message="Parent comment's photo id and photo_id must match",
+                                   response_status=status.HTTP_400_BAD_REQUEST
+                                )
+                )
                 raise
 
         except Comment.DoesNotExist:
-            self.add_error("parent_id", "Parent comment with given id not found")
+            self.add_error("parent_id", Error(message="Parent comment with given id not found"))
             self.response_status = status.HTTP_404_NOT_FOUND
             self.stop_process()
         except Photo.DoesNotExist:
-            self.add_error("photo_id", "Photo with given id not found")
+            self.add_error("photo_id", Error(message="Photo with given id not found"))
             self.response_status = status.HTTP_404_NOT_FOUND
             self.stop_process()
         except Exception:

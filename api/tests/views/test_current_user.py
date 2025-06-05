@@ -13,7 +13,7 @@ class CurrentUserViewTest(APITestCase):
 
     def test_get_current_user_no_authorization_header(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) # TODO: fix to 401
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_current_user_with_correct_token(self):
         response = self.client.get(
@@ -31,4 +31,4 @@ class CurrentUserViewTest(APITestCase):
                 "Authorization": f"Bearer BLAH-BLAH-BLAH"
             }
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) # TODO: fix to 401
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

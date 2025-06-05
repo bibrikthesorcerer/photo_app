@@ -27,28 +27,13 @@ class CommentsView(BaseView):
         return Response(data)
     
     def post(self, request):
-        try:
-            outcome = ServiceOutcome(
-                CreateComment,
-                (self.request.data | {'user': request.user})
-            )
-            new_comment = outcome.result
-            data = CommentSerializer(new_comment).data
-            return Response(data, status=status.HTTP_201_CREATED)
-        
-        except ServiceObjectLogicError as e:
-            return Response(
-                {'errors': e.errors_dict, 'info': e.additional_info},
-                status=e.response_status
-            )
-        except InvalidInputsError as e:
-            return Response(
-                # e.errors.as_data() | e.non_field_errors.as_data(), TODO
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            print(e)
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        outcome = ServiceOutcome(
+            CreateComment,
+            (self.request.data | {'user': request.user})
+        )
+        new_comment = outcome.result
+        data = CommentSerializer(new_comment).data
+        return Response(data, status=status.HTTP_201_CREATED)
         
 
 class SingleCommentView(BaseView):
@@ -63,32 +48,12 @@ class SingleCommentView(BaseView):
         comment = outcome.result
         self.check_object_permissions(self.request, comment)
         return comment
-    
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            return super().dispatch(request, *args, **kwargs)
-        except ServiceObjectLogicError as e:
-            self.response = Response(
-                {'errors': e.errors_dict, 'info': e.additional_info},
-                status=e.response_status
-            )
-        except InvalidInputsError as e:
-            self.response = Response(
-                # e.errors.as_data() | e.non_field_errors.as_data(), TODO
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            self.response = Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        finally:
-            return self.finalize_response(request, self.response, *args, **kwargs)
-
 
     def get(self, request, *args, **kwargs):
         outcome = ServiceOutcome(RetrieveComment, kwargs)
         comment_obj = outcome.result
         data = RetrieveCommentSerializer(comment_obj).data
         return Response(data)
-        
         
     def put(self, request, *args, **kwargs):
         comment = self.get_comment_with_permission_check()

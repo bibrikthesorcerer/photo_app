@@ -1,6 +1,6 @@
 import pathlib
 from service_objects.services import ServiceWithResult
-from service_objects.fields import ModelField
+from service_objects.errors import Error
 from django import forms
 from rest_framework import status
 from django.contrib.contenttypes.models import ContentType
@@ -18,7 +18,11 @@ class UpdatePhoto(ServiceWithResult):
 
     def _new_fields_are_present(self):
         if len(self.changed_data) <= 1:
-            self.add_error(None, "No values for new fields provided")
+            self.add_error(None, Error(
+                message="No values for new fields provided",
+                response_status = status.HTTP_400_BAD_REQUEST
+                )
+            )
             self.response_status = status.HTTP_400_BAD_REQUEST
             self.stop_process()
 
@@ -55,7 +59,7 @@ class UpdatePhoto(ServiceWithResult):
         try:
             self.photo_obj = Photo.objects.prefetch_related("review_tickets").get(id=photo_id)
         except Photo.DoesNotExist:
-            self.add_error("photo_id", "Photo with given id not found")
+            self.add_error("photo_id", Error(message="Photo with given id not found"))
             self.response_status = status.HTTP_404_NOT_FOUND
             self.stop_process()
         
