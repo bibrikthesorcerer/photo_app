@@ -1,1 +1,1 @@
-from .views import PhotosView, SinglePhotoView
+from .views import PhotosView, SinglePhotoView, RecoverPhotoView

@@ -4,9 +4,12 @@ from service_objects.errors import Error
 from django import forms
 from rest_framework import status
 from django.contrib.contenttypes.models import ContentType
+from decouple import config
 
 from models_app.models import Photo, PhotoVersion
 from api.services.photo_version.create import CreatePhotoVersion
+from api.tasks import delete_photo_by_id
+
 
 class UpdatePhoto(ServiceWithResult):
     photo_id = forms.IntegerField()
@@ -73,3 +76,74 @@ class UpdatePhoto(ServiceWithResult):
         ticket.object_id = self.photo_version.id
         ticket.content_type = ContentType.objects.get_for_model(PhotoVersion)
         ticket.save(update_fields=['object_id', 'content_type'])
+
+
+class SchedulePhotoDeletion(ServiceWithResult):
+    photo_id = forms.IntegerField()
+
+    custom_validations = ["_photo_exists", "_photo_status_not_tbd"]
+
+    def process(self):
+        self.run_custom_validations()
+        self._set_status_to_tbd()
+        self._schedule_task()
+        return self
+    
+    def _photo_exists(self):
+        try:
+            self.photo_obj = Photo.objects.get(id=self.cleaned_data.get('photo_id'))
+        except Photo.DoesNotExist:
+            self.add_error("photo_id", Error(message="Photo with given id not found"))
+            self.response_status = status.HTTP_404_NOT_FOUND
+            self.stop_process()
+
+    def _photo_status_not_tbd(self):
+        if self.photo_obj.status == Photo.TO_BE_DELETED:
+            self.add_error(None, Error(message="Photo already set to be deleted"))
+            self.response_status = status.HTTP_410_GONE
+            self.stop_process()
+    
+    def _set_status_to_tbd(self) -> bool:
+        self.photo_obj.status = Photo.TO_BE_DELETED
+        self.photo_obj.save()
+
+    def _schedule_task(self):
+        delete_photo_by_id.apply_async(
+            (self.photo_obj.id,),
+            countdown=config('PHOTO_DELETION_COUNTDOWN', default=20, cast=int)
+        )
+
+class RecoverPhotoFromDeletion(ServiceWithResult):
+    photo_id = forms.IntegerField()
+
+    custom_validations = ["_photo_exists", "_photo_status_is_tbd"]
+
+    def process(self):
+        self.run_custom_validations()
+        self._recover_photo()
+        return self
+    
+    def _photo_exists(self):
+        try:
+            self.photo_obj = Photo.objects.prefetch_related("review_tickets").get(id=self.cleaned_data.get('photo_id'))
+        except Photo.DoesNotExist:
+            self.add_error("photo_id", Error(message="Photo with given id not found"))
+            self.response_status = status.HTTP_404_NOT_FOUND
+            self.stop_process()
+
+    def _photo_status_is_tbd(self):
+        if self.photo_obj.status != Photo.TO_BE_DELETED:
+            self.add_error(
+                None,
+                Error(
+                    message="Photo is not set to be deleted",
+                    response_status=status.HTTP_400_BAD_REQUEST
+                )
+            )
+            self.response_status = status.HTTP_400_BAD_REQUEST
+            self.stop_process()
+
+    def _recover_photo(self):
+        review_ticket = self.photo_obj.review_tickets.first()
+        self.photo_obj.status = review_ticket.result if review_ticket else Photo.ON_MODERATION
+        self.photo_obj.save()

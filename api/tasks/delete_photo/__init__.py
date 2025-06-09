@@ -1,0 +1,1 @@
+from .tasks import delete_photo_by_id

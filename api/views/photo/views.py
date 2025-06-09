@@ -4,7 +4,7 @@ from rest_framework import status
 from service_objects.services import ServiceOutcome
 
 from api.views.base_view import BaseView
-from api.services import ListPhotos, CreatePhoto, RetrievePhoto, UpdatePhoto
+from api.services import ListPhotos, CreatePhoto, RetrievePhoto, UpdatePhoto, SchedulePhotoDeletion, RecoverPhotoFromDeletion
 from api.serializers import PageSerializer, PhotoSerializer
 from api.permissions import IsOwner
 
@@ -61,4 +61,21 @@ class SinglePhotoView(BaseView):
         return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
-        pass
+        outcome = ServiceOutcome(
+            SchedulePhotoDeletion,
+            kwargs,
+        )
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+class RecoverPhotoView(BaseView):
+    def get_permissions(self):
+        if self.request.method in ["PUT"]:
+            self.permission_classes = [IsAuthenticated, IsOwner]
+        return super().get_permissions()
+    
+    def put(self, request, *args, **kwargs):
+        outcome = ServiceOutcome(
+            RecoverPhotoFromDeletion,
+            kwargs
+        )
+        return Response(status=status.HTTP_200_OK)
