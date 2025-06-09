@@ -1,6 +1,7 @@
 import pathlib
 from service_objects.services import ServiceWithResult
 from service_objects.errors import Error
+from service_objects.fields import ModelField
 from django import forms
 from rest_framework import status
 from django.contrib.contenttypes.models import ContentType
@@ -12,7 +13,7 @@ from api.tasks import delete_photo_by_id
 
 
 class UpdatePhoto(ServiceWithResult):
-    photo_id = forms.IntegerField()
+    photo = ModelField(Photo)
     img = forms.ImageField(required=False)
     title = forms.CharField(max_length=64, required=False)
     description = forms.CharField(max_length=256, required=False)
@@ -58,13 +59,7 @@ class UpdatePhoto(ServiceWithResult):
         self.photo_obj.pub_date = None
 
     def _get_photo_instance(self) -> Photo:
-        photo_id = self.cleaned_data.get('photo_id')
-        try:
-            self.photo_obj = Photo.objects.prefetch_related("review_tickets").get(id=photo_id)
-        except Photo.DoesNotExist:
-            self.add_error("photo_id", Error(message="Photo with given id not found"))
-            self.response_status = status.HTTP_404_NOT_FOUND
-            self.stop_process()
+        self.photo_obj = self.cleaned_data.get('photo')
         
     def _create_version(self):
         self.photo_version = CreatePhotoVersion.execute({"photo": self.photo_obj}).result
@@ -79,23 +74,16 @@ class UpdatePhoto(ServiceWithResult):
 
 
 class SchedulePhotoDeletion(ServiceWithResult):
-    photo_id = forms.IntegerField()
+    photo = ModelField(Photo)
 
-    custom_validations = ["_photo_exists", "_photo_status_not_tbd"]
+    custom_validations = ["_photo_status_not_tbd"]
 
     def process(self):
+        self.photo_obj = self.cleaned_data.get("photo")
         self.run_custom_validations()
         self._set_status_to_tbd()
         self._schedule_task()
         return self
-    
-    def _photo_exists(self):
-        try:
-            self.photo_obj = Photo.objects.get(id=self.cleaned_data.get('photo_id'))
-        except Photo.DoesNotExist:
-            self.add_error("photo_id", Error(message="Photo with given id not found"))
-            self.response_status = status.HTTP_404_NOT_FOUND
-            self.stop_process()
 
     def _photo_status_not_tbd(self):
         if self.photo_obj.status == Photo.TO_BE_DELETED:
@@ -114,22 +102,15 @@ class SchedulePhotoDeletion(ServiceWithResult):
         )
 
 class RecoverPhotoFromDeletion(ServiceWithResult):
-    photo_id = forms.IntegerField()
+    photo = ModelField(Photo)
 
-    custom_validations = ["_photo_exists", "_photo_status_is_tbd"]
+    custom_validations = ["_photo_status_is_tbd"]
 
     def process(self):
+        self.photo_obj = self.cleaned_data.get('photo')
         self.run_custom_validations()
         self._recover_photo()
         return self
-    
-    def _photo_exists(self):
-        try:
-            self.photo_obj = Photo.objects.prefetch_related("review_tickets").get(id=self.cleaned_data.get('photo_id'))
-        except Photo.DoesNotExist:
-            self.add_error("photo_id", Error(message="Photo with given id not found"))
-            self.response_status = status.HTTP_404_NOT_FOUND
-            self.stop_process()
 
     def _photo_status_is_tbd(self):
         if self.photo_obj.status != Photo.TO_BE_DELETED:

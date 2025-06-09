@@ -40,6 +40,12 @@ class SinglePhotoView(BaseView):
         if self.request.method in ["PUT", "DELETE"]:
             self.permission_classes = [IsAuthenticated, IsOwner]
         return super().get_permissions()
+    
+    def _get_photo_with_permission_check(self):
+        outcome = ServiceOutcome(RetrievePhoto, self.kwargs)
+        comment = outcome.result
+        self.check_object_permissions(self.request, comment)
+        return comment
 
     def get(self, request, *args, **kwargs):
         outcome = ServiceOutcome(
@@ -52,30 +58,36 @@ class SinglePhotoView(BaseView):
     def put(self, request, *args, **kwargs):
         if request.data is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        photo = self._get_photo_with_permission_check()
         outcome = ServiceOutcome(
             UpdatePhoto,
-            (request.data | kwargs),
+            ({"photo":photo} | request.data | kwargs),
             request.data
         )
         data = PhotoSerializer(outcome.result).data
         return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
+        photo = self._get_photo_with_permission_check()
         outcome = ServiceOutcome(
             SchedulePhotoDeletion,
-            kwargs,
+            ({"photo": photo} | kwargs),
         )
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class RecoverPhotoView(BaseView):
-    def get_permissions(self):
-        if self.request.method in ["PUT"]:
-            self.permission_classes = [IsAuthenticated, IsOwner]
-        return super().get_permissions()
+    permission_classes = [IsAuthenticated, IsOwner]
     
+    def _get_photo_with_permission_check(self): # TODO move to BaseView with Retrieve-service as arg, to be DRY
+        outcome = ServiceOutcome(RetrievePhoto, self.kwargs)
+        comment = outcome.result
+        self.check_object_permissions(self.request, comment)
+        return comment
+
     def put(self, request, *args, **kwargs):
+        photo = self._get_photo_with_permission_check()
         outcome = ServiceOutcome(
             RecoverPhotoFromDeletion,
-            kwargs
+            ({"photo": photo} | kwargs)
         )
         return Response(status=status.HTTP_200_OK)
