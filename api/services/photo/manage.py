@@ -20,15 +20,15 @@ class UpdatePhoto(ServiceWithResult):
 
     custom_validations = ["_new_fields_are_present"]
 
-    def _new_fields_are_present(self):
-        if len(self.changed_data) <= 1:
-            self.add_error(None, ValidationError(message="No values for new fields provided",))
-            self.stop_process()
-
     def process(self):
         self.run_custom_validations()
         self.result = self._update_photo_instance()
         return self
+
+    def _new_fields_are_present(self):
+        if len(self.changed_data) <= 1:
+            self.add_error(None, ValidationError(message="No values for new fields provided",))
+            self.stop_process()
     
     def _update_photo_instance(self):
         self._get_photo_instance()
