@@ -19,19 +19,19 @@ class SingleCommentViewTest(APITestCase):
         self.test_comment_with_child = CommentFactory.create(user=self.test_user, children__num_children=1)
         self.comments = CommentFactory.create_batch(10)
 
-    def test_get_comment_valid_id(self):
+    def test_get_comment_valid_id_status_200(self):
         response = self.client.get(
             reverse('api:single_comment', kwargs={"comment_id": self.comments[0].id})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_comment_invalid_id(self):
+    def test_get_comment_invalid_id_status_404(self):
         response = self.client.get(
             reverse('api:single_comment', kwargs={"comment_id": self.comments[-1].id*10})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_comment_success(self):
+    def test_update_comment_success_status_200(self):
         response = self.client.put(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             data={"text": "new comment text"},
@@ -42,7 +42,7 @@ class SingleCommentViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_comment_not_owner(self):
+    def test_update_comment_not_owner_status_403(self):
         response = self.client.put(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             data={"text": "new comment text"},
@@ -53,7 +53,7 @@ class SingleCommentViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_update_comment_no_body(self):
+    def test_update_comment_no_body_status_400(self):
         response = self.client.put(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             headers= {
@@ -62,7 +62,7 @@ class SingleCommentViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_update_comment_invalid_input(self):
+    def test_update_comment_invalid_input_status_400(self):
         response = self.client.put(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             data={"text": "A"*(Comment._meta.get_field('text').max_length+1)},
@@ -73,7 +73,7 @@ class SingleCommentViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_delete_success(self):
+    def test_delete_success_status_200(self):
         response = self.client.delete(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             headers= {
@@ -84,7 +84,7 @@ class SingleCommentViewTest(APITestCase):
         self.assertNotEqual(response.data['deleted_at'], None)
         self.assertTrue(response.data['is_deleted'])
 
-    def test_delete_not_owner(self):
+    def test_delete_not_owner_status_403(self):
         response = self.client.delete(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment.id}),
             headers= {
@@ -93,7 +93,7 @@ class SingleCommentViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_with_children(self):
+    def test_delete_with_children_status_200(self):
         response = self.client.delete(
             reverse('api:single_comment', kwargs={"comment_id": self.test_comment_with_child.id}),
             headers= {

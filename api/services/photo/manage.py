@@ -1,6 +1,6 @@
 import pathlib
 from service_objects.services import ServiceWithResult
-from service_objects.errors import Error
+from service_objects.errors import ValidationError, Error
 from service_objects.fields import ModelField
 from django import forms
 from rest_framework import status
@@ -22,12 +22,7 @@ class UpdatePhoto(ServiceWithResult):
 
     def _new_fields_are_present(self):
         if len(self.changed_data) <= 1:
-            self.add_error(None, Error(
-                message="No values for new fields provided",
-                response_status = status.HTTP_400_BAD_REQUEST
-                )
-            )
-            self.response_status = status.HTTP_400_BAD_REQUEST
+            self.add_error(None, ValidationError(message="No values for new fields provided",))
             self.stop_process()
 
     def process(self):
@@ -87,8 +82,7 @@ class SchedulePhotoDeletion(ServiceWithResult):
 
     def _photo_status_not_tbd(self):
         if self.photo_obj.status == Photo.TO_BE_DELETED:
-            self.add_error(None, Error(message="Photo already set to be deleted"))
-            self.response_status = status.HTTP_410_GONE
+            self.add_error(None, Error(message="Photo already set to be deleted", response_status = status.HTTP_410_GONE))
             self.stop_process()
     
     def _set_status_to_tbd(self) -> bool:
@@ -116,12 +110,11 @@ class RecoverPhotoFromDeletion(ServiceWithResult):
         if self.photo_obj.status != Photo.TO_BE_DELETED:
             self.add_error(
                 None,
-                Error(
+                ValidationError(
                     message="Photo is not set to be deleted",
                     response_status=status.HTTP_400_BAD_REQUEST
                 )
             )
-            self.response_status = status.HTTP_400_BAD_REQUEST
             self.stop_process()
 
     def _recover_photo(self):

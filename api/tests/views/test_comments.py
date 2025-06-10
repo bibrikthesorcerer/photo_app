@@ -20,7 +20,7 @@ class CommentsViewTest(APITestCase):
         self.comments = CommentFactory.create_batch(10)
         self.test_photo = PhotoFactory.create()
 
-    def test_get_comments_no_params(self):
+    def test_get_comments_no_params_status_200(self):
         response = self.client.get(self.url)
         expected_comments_num = Comment.objects.filter(
             Q(deleted_at=None) | (Q(text__exact="DELETED") & ~Q(deleted_at=None))
@@ -28,7 +28,7 @@ class CommentsViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['objects']), expected_comments_num)
 
-    def test_get_comments_some_params(self):
+    def test_get_comments_some_params_status_200(self):
         response = self.client.get(
             self.url,
             QUERY_STRING="per_page=4&order=pub_date"
@@ -39,7 +39,7 @@ class CommentsViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['objects']), expected_comments_num)
 
-    def test_get_comments_as_thread(self):
+    def test_get_comments_as_thread_status_200(self):
         response = self.client.get(
             self.url,
             QUERY_STRING=f"id={self.thread.id}"
@@ -58,7 +58,7 @@ class CommentsViewTest(APITestCase):
         expected_comments = sorted(expected_comments, key=lambda x: x.get('pub_date'), reverse=True)
         self.assertEqual(response.data['objects'], expected_comments) 
 
-    def test_create_comment_success(self):
+    def test_create_comment_success_status_201(self):
         response = self.client.post(
             self.url,
             data={
@@ -73,7 +73,7 @@ class CommentsViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_comment_validation_error(self):
+    def test_create_comment_validation_error_status_400(self):
         response = self.client.post(
             self.url,
             data={
@@ -88,7 +88,7 @@ class CommentsViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_comment_invalid_inputs_error_missing(self):
+    def test_create_comment_invalid_inputs_error_missing_status_400(self):
         response = self.client.post(
             self.url,
             data={
@@ -102,7 +102,7 @@ class CommentsViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_comment_invalid_inputs_error_not_found(self):
+    def test_create_comment_invalid_inputs_error_not_found_status_404(self):
         response = self.client.post(
             self.url,
             data={
@@ -116,5 +116,3 @@ class CommentsViewTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-

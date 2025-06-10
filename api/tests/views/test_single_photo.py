@@ -17,19 +17,19 @@ class SinglePhotoViewTest(APITestCase):
         self.test_photo = PhotoFactory.create(user=self.test_user)
         self.test_photo_review_ticket = ReviewTicketFactory.create(reviewed_object=self.test_photo)
 
-    def test_retrieve_photo_success(self):
+    def test_retrieve_photo_success_status_200(self):
         response = self.client.get(
             reverse("api:single_photo", args=[self.test_photo.id])
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_retrieve_photo_not_found(self):
+    def test_retrieve_photo_not_found_status_404(self):
         response = self.client.get(
             reverse("api:single_photo", args=[123])
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_photo_success(self):
+    def test_update_photo_success_status_200(self):
         response = self.client.put(
             reverse("api:single_photo", args=[self.test_photo.id]),
             data={
@@ -46,7 +46,7 @@ class SinglePhotoViewTest(APITestCase):
         ticket = PhotoVersion.objects.prefetch_related('review_tickets').get(photo=self.test_photo).review_tickets.all()[0]
         self.assertTrue(ticket and len(self.test_photo.review_tickets.all()) == 0)
 
-    def test_update_no_fields_failure(self):
+    def test_update_no_fields_failure_status_400(self):
         response = self.client.put(
             reverse("api:single_photo", args=[self.test_photo.id]),
             data={},
@@ -55,7 +55,7 @@ class SinglePhotoViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_delete_success(self):
+    def test_delete_success_status_202(self):
         response = self.client.delete(
             reverse("api:single_photo", args=[self.test_photo.id]),
             data={},
@@ -64,7 +64,7 @@ class SinglePhotoViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
 
-    def test_delete_not_found(self):
+    def test_delete_not_found_status_404(self):
         response = self.client.delete(
             reverse("api:single_photo", args=[self.test_photo.id*1000]),
             data={},
@@ -73,7 +73,7 @@ class SinglePhotoViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_gone(self):
+    def test_delete_gone_status_410(self):
         request_data = {
             "path":reverse("api:single_photo", args=[self.test_photo.id]),
             "data":{},
@@ -84,7 +84,7 @@ class SinglePhotoViewTest(APITestCase):
         response = self.client.delete(**request_data)
         self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
-    def test_recover_success(self):
+    def test_recover_success_status_200(self):
         request_commons = {
             'data':{},
             'headers':{"Authorization": f"Bearer {self.user_token}"},
@@ -100,7 +100,7 @@ class SinglePhotoViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_recover_not_found(self):
+    def test_recover_not_found_status_404(self):
         response = self.client.put(
             reverse("api:recover_photo", args=[self.test_photo.id*1000]),
             data={},
@@ -109,7 +109,7 @@ class SinglePhotoViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_recover_status_not_tbd(self):
+    def test_recover_photo_not_being_deleted_status_400(self):
         response = self.client.put(
             reverse("api:recover_photo", args=[self.test_photo.id]),
             data={},

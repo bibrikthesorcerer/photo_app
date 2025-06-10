@@ -11,11 +11,11 @@ class CurrentUserViewTest(APITestCase):
         self.test_user = UserProfileFactory.create()
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
 
-    def test_get_current_user_no_authorization_header(self):
+    def test_get_current_user_no_authorization_header_status_401(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_current_user_with_correct_token(self):
+    def test_get_current_user_with_correct_token_status_200(self):
         response = self.client.get(
             self.url,
             headers= {
@@ -24,7 +24,7 @@ class CurrentUserViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_current_user_with_incorrect_token(self):
+    def test_get_current_user_with_incorrect_token_status_401(self):
         response = self.client.get(
             self.url,
             headers= {

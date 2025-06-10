@@ -1,5 +1,5 @@
 from service_objects.services import ServiceWithResult
-from service_objects.errors import Error
+from service_objects.errors import NotFound
 from rest_framework import status
 from django import forms
 from django.db.models import Q, Prefetch
@@ -21,8 +21,7 @@ class RetrieveComment(ServiceWithResult):
         try:
             return self.objects.get(id=comment_id)
         except Comment.DoesNotExist as e:
-            self.add_error("comment_id", Error(message="Comment with given id not found"))
-            self.response_status = status.HTTP_404_NOT_FOUND
+            self.add_error("comment_id", NotFound(message="Comment with given id not found"))
             self.stop_process()
 
     def _get_comments_manager(self):

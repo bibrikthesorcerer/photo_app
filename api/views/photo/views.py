@@ -38,7 +38,7 @@ class PhotosView(BaseView):
 class SinglePhotoView(BaseView):
     def get_permissions(self):
         if self.request.method in ["PUT", "DELETE"]:
-            self.permission_classes = [IsAuthenticated, IsOwner]
+            self.permission_classes = [IsOwner]
         return super().get_permissions()
     
     def _get_photo_with_permission_check(self):
@@ -76,7 +76,7 @@ class SinglePhotoView(BaseView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class RecoverPhotoView(BaseView):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [IsOwner]
     
     def _get_photo_with_permission_check(self): # TODO move to BaseView with Retrieve-service as arg, to be DRY
         outcome = ServiceOutcome(RetrievePhoto, self.kwargs)

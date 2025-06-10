@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from service_objects.services import ServiceOutcome, ServiceObjectLogicError
 from service_objects.errors import InvalidInputsError
 from rest_framework.exceptions import APIException
+from rest_framework.decorators import permission_classes
 
 from api.views import BaseView
 from api.permissions import IsOwner
@@ -40,7 +41,7 @@ class SingleCommentView(BaseView):
 
     def get_permissions(self):
         if self.request.method in ['PUT', 'DELETE']:
-            self.permission_classes = [IsAuthenticated, IsOwner]
+            self.permission_classes = [IsOwner]
         return super().get_permissions()
     
     def get_comment_with_permission_check(self):

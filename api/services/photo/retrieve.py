@@ -1,5 +1,5 @@
 from service_objects.services import ServiceWithResult
-from service_objects.errors import Error
+from service_objects.errors import NotFound
 from django import forms
 from django.db.models import Count, Q, Exists, OuterRef
 from rest_framework import status
@@ -20,8 +20,7 @@ class RetrievePhoto(ServiceWithResult):
         try:
             return self.objects.get(id=self.cleaned_data.get('photo_id'))
         except Photo.DoesNotExist:
-            self.add_error("photo_id", Error(message="Photo with given id not found"))
-            self.response_status = status.HTTP_404_NOT_FOUND
+            self.add_error("photo_id", NotFound(message="Photo with given id not found"))
             self.stop_process()
 
     def _get_photos_manager(self):

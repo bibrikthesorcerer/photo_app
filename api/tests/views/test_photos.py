@@ -22,7 +22,7 @@ class PhotosViewTest(APITestCase):
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
         self.photos = PhotoFactory.create_batch(10)
 
-    def test_get_photos_no_params(self):
+    def test_get_photos_no_params_status_200(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
@@ -30,7 +30,7 @@ class PhotosViewTest(APITestCase):
         
         self.assertEqual(len(response.data['objects']), expected_photos_num)
 
-    def test_get_photos_with_params(self):
+    def test_get_photos_with_params_status_200(self):
         response = self.client.get(
             self.url,
             QUERY_STRING=f"per_page=3&page=2&status={Photo.ON_MODERATION}"
@@ -40,7 +40,7 @@ class PhotosViewTest(APITestCase):
         expected_photos_num = Photo.objects.filter(status=Photo.ON_MODERATION)[3:6].count()
         self.assertEqual(len(response.data['objects']), expected_photos_num)
 
-    def test_create_photo_success(self):
+    def test_create_photo_success_status_201(self):
         img_buffer = BytesIO()
         image = Image.new('RGB', (1,1))
         image.save(img_buffer, format='PNG')
@@ -56,7 +56,7 @@ class PhotosViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_photo_invalid_inputs(self):
+    def test_create_photo_invalid_inputs_status_400(self):
         response = self.client.post(
             self.url,
             data={
