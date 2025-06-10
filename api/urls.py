@@ -13,4 +13,6 @@ urlpatterns = [
     path('photos', views.PhotosView.as_view(), name='photos'),
     path('photos/<int:photo_id>', views.SinglePhotoView.as_view(), name='single_photo'),
     path('photos/<int:photo_id>:recover', views.RecoverPhotoView.as_view(), name='recover_photo'),
+    
+    path('photos/<int:photo_id>/versions', views.PhotoVersionView.as_view(), name='photo_versions'),
 ]

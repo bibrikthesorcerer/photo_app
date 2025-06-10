@@ -2,5 +2,4 @@ from rest_framework import permissions
 
 class IsOwner(permissions.IsAuthenticated):
     def has_object_permission(self, request, view, obj):
-        super().has_permission(request, view)
-        return obj.user == request.user
+        return (obj.user == request.user) and super().has_permission(request, view)

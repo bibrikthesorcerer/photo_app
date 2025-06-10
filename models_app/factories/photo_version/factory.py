@@ -1,5 +1,8 @@
 import factory
-from django.utils.timezone import now
+from django.utils import timezone
+from factory import fuzzy, SubFactory
+
+from models_app.factories import PhotoFactory
 
 
 class PhotoVersionFactory(factory.django.DjangoModelFactory):
@@ -8,6 +11,11 @@ class PhotoVersionFactory(factory.django.DjangoModelFactory):
 
     title = factory.Faker("sentence", nb_words=7)
     description = factory.Faker("sentence", nb_words=20)
-    pub_date = factory.LazyAttribute(lambda self: now())
-    path = factory.Faker("file_path")
-    status = "Approved"
+    img = factory.django.ImageField(
+        width=1000,
+        height=1000,
+        filename='sample_version.jpg',
+        color='red'
+    )
+    photo = SubFactory(PhotoFactory)
+    iteration = fuzzy.FuzzyInteger(low=1)
