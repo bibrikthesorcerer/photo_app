@@ -18,6 +18,7 @@ class ReviewTicket(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     reviewed_object = GenericForeignKey("content_type", "object_id")
+    is_seen = models.BooleanField(default=False)
 
     def __str__(self):
         return f"ReviewTicket for {self.reviewed_object}"

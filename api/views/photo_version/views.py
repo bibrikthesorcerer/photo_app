@@ -13,9 +13,9 @@ class PhotoVersionView(BaseView):
 
     def _get_photo_with_permission_check(self):
         outcome = ServiceOutcome(RetrievePhoto, self.kwargs)
-        object = outcome.result
-        self.check_object_permissions(self.request, object)
-        return object
+        obj = outcome.result
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get(self, request, *args, **kwargs):
         photo = self._get_photo_with_permission_check()

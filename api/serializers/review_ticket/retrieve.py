@@ -6,4 +6,4 @@ from models_app.models import ReviewTicket
 class RetrieveReviewTicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewTicket
-        fields = ['id', 'result', 'commentary', 'created_at']
+        fields = ['id', 'result', 'commentary', 'is_seen', 'created_at']

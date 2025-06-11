@@ -80,9 +80,9 @@ class RecoverPhotoView(BaseView):
     
     def _get_photo_with_permission_check(self): # TODO move to BaseView with Retrieve-service as arg, to be DRY
         outcome = ServiceOutcome(RetrievePhoto, self.kwargs)
-        object = outcome.result
-        self.check_object_permissions(self.request, object)
-        return object
+        obj = outcome.result
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def put(self, request, *args, **kwargs):
         photo = self._get_photo_with_permission_check()

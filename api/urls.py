@@ -15,4 +15,8 @@ urlpatterns = [
     path('photos/<int:photo_id>:recover', views.RecoverPhotoView.as_view(), name='recover_photo'),
     
     path('photos/<int:photo_id>/versions', views.PhotoVersionView.as_view(), name='photo_versions'),
+    
+    path('photos/<int:photo_id>/likes', views.LikesView.as_view(), name='photo_likes'),
+    
+    path('review_tickets/<int:ticket_id>', views.ReviewTicketView.as_view(), name="review_tickets")
 ]
