@@ -1,4 +1,3 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 from django.db.models import Q
@@ -8,10 +7,11 @@ from models_app.factories.user_profile import UserProfileFactory
 from models_app.factories import CommentFactory, PhotoFactory, ThreadsCommentFactory
 from main_app.services import IssueNewUserAPIToken
 from api.serializers import CommentSerializer
+from api.tests.utils import TempDirectoryAPITestCase
 from models_app.models import Comment
 
 
-class CommentsViewTest(APITestCase):
+class CommentsViewTest(TempDirectoryAPITestCase):
     def setUp(self):
         self.url = reverse('api:comments')
         self.test_user = UserProfileFactory.create()

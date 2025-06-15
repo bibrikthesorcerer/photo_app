@@ -4,9 +4,10 @@ from django.urls import reverse
 
 from models_app.factories import LikeFactory, UserProfileFactory, PhotoFactory
 from main_app.services import IssueNewUserAPIToken
+from api.tests.utils import TempDirectoryAPITestCase
 
 
-class LikesViewTest(APITestCase):
+class LikesViewTest(TempDirectoryAPITestCase):
     def setUp(self):
         self.test_user = UserProfileFactory.create(user=True)
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})

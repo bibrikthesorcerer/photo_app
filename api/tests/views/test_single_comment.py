@@ -5,11 +5,11 @@ from django.urls import reverse
 from models_app.factories.user_profile import UserProfileFactory
 from models_app.factories import CommentFactory
 from main_app.services import IssueNewUserAPIToken
-from api.serializers import RetrieveCommentSerializer
 from models_app.models import Comment
+from api.tests.utils import TempDirectoryAPITestCase
 
 
-class SingleCommentViewTest(APITestCase):
+class SingleCommentViewTest(TempDirectoryAPITestCase):
     def setUp(self):
         self.test_user = UserProfileFactory.create()
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})

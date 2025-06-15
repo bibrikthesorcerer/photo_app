@@ -1,6 +1,5 @@
 from PIL import Image
 from io import BytesIO
-from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 from django.db.models import Count, Q
@@ -11,11 +10,12 @@ from models_app.models import Photo
 from models_app.factories.user_profile import UserProfileFactory
 from models_app.factories import PhotoFactory
 from main_app.services import IssueNewUserAPIToken
+from api.tests.utils import TempDirectoryAPITestCase
 from api.serializers import PhotoSerializer, PageSerializer
 from django.core.paginator import Paginator
 
 
-class PhotosViewTest(APITestCase):
+class PhotosViewTest(TempDirectoryAPITestCase):
     def setUp(self):
         self.url = reverse('api:photos')
         self.test_user = UserProfileFactory.create()

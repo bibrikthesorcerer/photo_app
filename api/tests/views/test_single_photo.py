@@ -1,16 +1,14 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
-from django.db.models import Count, Q
 
 from models_app.factories.user_profile import UserProfileFactory
 from models_app.factories import PhotoFactory, ReviewTicketFactory
 from main_app.services import IssueNewUserAPIToken
-from api.serializers import PhotoSerializer
-from models_app.models import Photo, PhotoVersion, ReviewTicket
+from models_app.models import PhotoVersion
+from api.tests.utils import TempDirectoryAPITestCase
 
 
-class SinglePhotoViewTest(APITestCase):
+class SinglePhotoViewTest(TempDirectoryAPITestCase):
     def setUp(self):
         self.test_user = UserProfileFactory.create()
         self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
