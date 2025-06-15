@@ -1,4 +1,3 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
@@ -7,15 +6,18 @@ from main_app.services import IssueNewUserAPIToken
 from api.tests.utils import TempDirectoryAPITestCase
 
 
-class ReviewTicketViewTest(TempDirectoryAPITestCase):
+class SetSeenReviewTicketTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_user_2 = UserProfileFactory.create()
+        cls.user_token_2 = IssueNewUserAPIToken.execute({"user": cls.test_user_2, "lifetime": 30})
+        cls.test_photo = PhotoFactory.create(user=cls.test_user)
+        cls.test_version = PhotoVersionFactory.create(photo=cls.test_photo)
+        
     def setUp(self):
-        self.test_user = UserProfileFactory.create()
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
-        self.test_user_2 = UserProfileFactory.create()
-        self.user_token_2 = IssueNewUserAPIToken.execute({"user": self.test_user_2, "lifetime": 30})
-        self.test_photo = PhotoFactory.create(user=self.test_user)
         self.test_review_ticket_for_photo = ReviewTicketFactory.create(reviewed_object=self.test_photo)
-        self.test_version = PhotoVersionFactory.create(photo=self.test_photo)
         self.test_review_ticket = ReviewTicketFactory.create(reviewed_object=self.test_version)
 
     def test_set_to_seen_success_status_200(self):
@@ -45,7 +47,6 @@ class ReviewTicketViewTest(TempDirectoryAPITestCase):
             headers={"Authorization": f"Bearer {self.user_token_2}"}
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
     def test_set_to_seen_already_seen_status_400(self):
         self.client.patch(

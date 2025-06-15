@@ -11,14 +11,14 @@ from api.tests.utils import TempDirectoryAPITestCase
 from models_app.models import Comment
 
 
-class CommentsViewTest(TempDirectoryAPITestCase):
-    def setUp(self):
-        self.url = reverse('api:comments')
-        self.test_user = UserProfileFactory.create()
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
-        self.thread = ThreadsCommentFactory(create_thread__thread_depth=3)
-        self.comments = CommentFactory.create_batch(10)
-        self.test_photo = PhotoFactory.create()
+class ListCommentsTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('api:comments')
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.thread = ThreadsCommentFactory(create_thread__thread_depth=3)
+        cls.comments = CommentFactory.create_batch(10)
 
     def test_get_comments_no_params_status_200(self):
         response = self.client.get(self.url)
@@ -56,7 +56,17 @@ class CommentsViewTest(TempDirectoryAPITestCase):
 
         expected_comments.extend(_collect_child_ids(self.thread))
         expected_comments = sorted(expected_comments, key=lambda x: x.get('pub_date'), reverse=True)
-        self.assertEqual(response.data['objects'], expected_comments) 
+        self.assertListEqual(response.data['objects'], expected_comments) 
+
+
+class CreateCommentTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('api:comments')
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_photo = PhotoFactory.create()
+        cls.comments = CommentFactory.create_batch(10)
 
     def test_create_comment_success_status_201(self):
         response = self.client.post(

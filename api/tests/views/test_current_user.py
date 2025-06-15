@@ -5,11 +5,12 @@ from django.urls import reverse
 from models_app.factories.user_profile.factory import UserProfileFactory
 from main_app.services import IssueNewUserAPIToken
 
-class CurrentUserViewTest(APITestCase):
-    def setUp(self):
-        self.url = reverse('api:current_user')
-        self.test_user = UserProfileFactory.create()
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
+class RetrieveCurrentUserTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse('api:current_user')
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
 
     def test_get_current_user_no_authorization_header_status_401(self):
         response = self.client.get(self.url)

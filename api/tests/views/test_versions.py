@@ -7,15 +7,16 @@ from main_app.services import IssueNewUserAPIToken
 from api.tests.utils import TempDirectoryAPITestCase
 
 
-class PhotoVersionsViewTest(TempDirectoryAPITestCase):
-    def setUp(self):
-        self.test_user = UserProfileFactory.create()
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
-        self.test_user_2 = UserProfileFactory.create()
-        self.user_token_2 = IssueNewUserAPIToken.execute({"user": self.test_user_2, "lifetime": 30})
-        self.test_photo = PhotoFactory.create(user=self.test_user)
-        self.test_version = PhotoVersionFactory.create(photo=self.test_photo)
-        self.test_review_ticket = ReviewTicketFactory.create(reviewed_object=self.test_version)
+class ListPhotoVersionsTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_user_2 = UserProfileFactory.create()
+        cls.user_token_2 = IssueNewUserAPIToken.execute({"user": cls.test_user_2, "lifetime": 30})
+        cls.test_photo = PhotoFactory.create(user=cls.test_user)
+        cls.test_version = PhotoVersionFactory.create(photo=cls.test_photo)
+        cls.test_review_ticket = ReviewTicketFactory.create(reviewed_object=cls.test_version)
 
     def test_get_versions_success_status_200(self):
         response = self.client.get(

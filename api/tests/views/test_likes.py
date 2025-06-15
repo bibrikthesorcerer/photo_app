@@ -1,4 +1,3 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
@@ -7,14 +6,14 @@ from main_app.services import IssueNewUserAPIToken
 from api.tests.utils import TempDirectoryAPITestCase
 
 
-class LikesViewTest(TempDirectoryAPITestCase):
-    def setUp(self):
-        self.test_user = UserProfileFactory.create(user=True)
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
-        self.test_admin = UserProfileFactory.create(admin=True)
-        self.admin_token = IssueNewUserAPIToken.execute({"user": self.test_admin, "lifetime": 30})
-        self.test_photo = PhotoFactory.create(user=self.test_user)
-        self.test_like = LikeFactory.create(user=self.test_user, photo=self.test_photo)
+class CreateLikeTest(TempDirectoryAPITestCase):
+    @classmethod 
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create(user=True)
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_admin = UserProfileFactory.create(admin=True)
+        cls.admin_token = IssueNewUserAPIToken.execute({"user": cls.test_admin, "lifetime": 30})
+        cls.test_photo = PhotoFactory.create(user=cls.test_user)
 
     def test_create_like_success_status_201(self):
         response = self.client.post(
@@ -35,7 +34,16 @@ class LikesViewTest(TempDirectoryAPITestCase):
             reverse("api:photo_likes", args=[self.test_photo.id]),
             headers={"Authorization": f"Bearer {self.admin_token}"}
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
+
+
+class DeleteLikeTest(TempDirectoryAPITestCase):
+    @classmethod 
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create(user=True)
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_photo = PhotoFactory.create(user=cls.test_user)
+        cls.test_like = LikeFactory.create(user=cls.test_user, photo=cls.test_photo)
 
     def test_delete_like_success_status_200(self):
         response = self.client.delete(

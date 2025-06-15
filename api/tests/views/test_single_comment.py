@@ -9,15 +9,10 @@ from models_app.models import Comment
 from api.tests.utils import TempDirectoryAPITestCase
 
 
-class SingleCommentViewTest(TempDirectoryAPITestCase):
-    def setUp(self):
-        self.test_user = UserProfileFactory.create()
-        self.user_token = IssueNewUserAPIToken.execute({"user": self.test_user, "lifetime": 30})
-        self.test_user2 = UserProfileFactory.create()
-        self.user_token2 = IssueNewUserAPIToken.execute({"user": self.test_user2, "lifetime": 30})
-        self.test_comment = CommentFactory.create(user=self.test_user)
-        self.test_comment_with_child = CommentFactory.create(user=self.test_user, children__num_children=1)
-        self.comments = CommentFactory.create_batch(10)
+class RetrieveCommentTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.comments = CommentFactory.create_batch(10)       
 
     def test_get_comment_valid_id_status_200(self):
         response = self.client.get(
@@ -30,6 +25,16 @@ class SingleCommentViewTest(TempDirectoryAPITestCase):
             reverse('api:single_comment', kwargs={"comment_id": self.comments[-1].id*10})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class UpdateCommentTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_user2 = UserProfileFactory.create()
+        cls.user_token2 = IssueNewUserAPIToken.execute({"user": cls.test_user2, "lifetime": 30})
+        cls.test_comment = CommentFactory.create(user=cls.test_user)
 
     def test_update_comment_success_status_200(self):
         response = self.client.put(
@@ -72,6 +77,17 @@ class SingleCommentViewTest(TempDirectoryAPITestCase):
             }
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentTest(TempDirectoryAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = UserProfileFactory.create()
+        cls.user_token = IssueNewUserAPIToken.execute({"user": cls.test_user, "lifetime": 30})
+        cls.test_user2 = UserProfileFactory.create()
+        cls.user_token2 = IssueNewUserAPIToken.execute({"user": cls.test_user2, "lifetime": 30})
+        cls.test_comment = CommentFactory.create(user=cls.test_user)
+        cls.test_comment_with_child = CommentFactory.create(user=cls.test_user, children__num_children=1)
 
     def test_delete_success_status_200(self):
         response = self.client.delete(
