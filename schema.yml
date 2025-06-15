@@ -59,6 +59,172 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/photos:
+    get:
+      operationId: photos_retrieve
+      tags:
+      - photos
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: photos_create
+      tags:
+      - photos
+      responses:
+        '200':
+          description: No response body
+  /api/photos/{photo_id}:
+    get:
+      operationId: photos_retrieve_2
+      summary: Get single Photo using id.
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        description: id of Photo to be retrieved
+        required: true
+      - in: query
+        name: user
+        schema:
+          type: integer
+        description: id of user, used to add user actions on Photo instance (e.g.
+          is_liked)
+      tags:
+      - photos
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+        '404':
+          description: Photo with given id not found
+    put:
+      operationId: photos_update
+      summary: Update Photo's information.
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        description: id of Photo to be updated
+        required: true
+      tags:
+      - photos
+      requestBody:
+        content:
+          img:
+            schema:
+              type: string
+              format: binary
+          title:
+            schema:
+              type: string
+          description:
+            schema:
+              type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+          description: ''
+        '400':
+          description: No values for new fields provided
+        '404':
+          description: Photo with given id not found
+    delete:
+      operationId: photos_destroy
+      summary: Schedule Photo's delayed deletion.
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        description: id of Photo to be deleted
+        required: true
+      tags:
+      - photos
+      responses:
+        '202':
+          description: Operation scheduled
+        '404':
+          description: Photo with given id not found
+        '410':
+          description: Photo already set to be deleted
+  /api/photos/{photo_id}/likes:
+    post:
+      operationId: photos_likes_create
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - photos
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: photos_likes_destroy
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - photos
+      responses:
+        '204':
+          description: No response body
+  /api/photos/{photo_id}/versions:
+    get:
+      operationId: photos_versions_retrieve
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - photos
+      responses:
+        '200':
+          description: No response body
+  /api/photos/{photo_id}:recover:
+    put:
+      operationId: photos_:recover_update
+      parameters:
+      - in: path
+        name: photo_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - photos
+      responses:
+        '200':
+          description: No response body
+  /api/review_tickets/{ticket_id}:
+    patch:
+      operationId: review_tickets_partial_update
+      parameters:
+      - in: path
+        name: ticket_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - review_tickets
+      responses:
+        '200':
+          description: No response body
   /api/users/current:
     get:
       operationId: users_current_retrieve
@@ -74,4 +240,69 @@ paths:
       responses:
         '200':
           description: No response body
-components: {}
+components:
+  schemas:
+    Photo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+          maxLength: 256
+        img_thumbnail:
+          type: string
+        img:
+          type: string
+          format: uri
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        pub_date:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          type: string
+        likes_count:
+          type: integer
+          readOnly: true
+        comments_count:
+          type: integer
+          readOnly: true
+        is_liked:
+          type: boolean
+      required:
+      - comments_count
+      - created_at
+      - description
+      - id
+      - img
+      - img_thumbnail
+      - likes_count
+      - title
+      - updated_at
+      - user
+    StatusEnum:
+      enum:
+      - TBD
+      - APR
+      - DEN
+      - OM
+      type: string
+      description: |-
+        * `TBD` - To Be Deleted
+        * `APR` - Approved
+        * `DEN` - Denied
+        * `OM` - On Moderation
