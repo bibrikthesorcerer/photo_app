@@ -9,8 +9,8 @@ class PhotoVersionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "models_app.PhotoVersion"
 
-    title = factory.Faker("sentence", nb_words=7)
-    description = factory.Faker("sentence", nb_words=20)
+    title = fuzzy.FuzzyText(length=32)
+    description = fuzzy.FuzzyText(length=128)
     img = factory.django.ImageField(
         width=1000,
         height=1000,
