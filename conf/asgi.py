@@ -14,14 +14,17 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 
 import notifications.routing
+from notifications.middleware import JWTAuthMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conf.settings')
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            notifications.routing.url_patterns
+    'websocket': JWTAuthMiddleware(
+        AuthMiddlewareStack(
+            URLRouter(
+                notifications.routing.url_patterns
+            )
         )
     )
 })
