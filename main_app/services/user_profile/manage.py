@@ -113,7 +113,8 @@ class IssueNewUserAPIToken(ServiceWithResult):
                 lifetime=timedelta(seconds=lifetime)
             )
         new_token.created = datetime.fromtimestamp(new_token['iat']).strftime('%Y-%m-%d %H:%M:%S')
-        cache_value(f'access_tokens:{user.username}', str(new_token), )
+        redis_ttl = self.cleaned_data.get("lifetime") or config("ACCESS_TOKEN_LIFETIME")
+        cache_value(f'access_tokens:{user.username}', str(new_token), redis_ttl)
         return new_token
 
     def process(self):
