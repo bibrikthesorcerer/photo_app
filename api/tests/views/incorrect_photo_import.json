@@ -1,0 +1,28 @@
+[
+    {
+        "description": "foo",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Rembrandt_Harmensz._van_Rijn_146.jpg",
+        "email": "this is definetly not an email",
+        "username": "testuser1",
+        "first_name": "test1",
+        "last_name": "user1"
+    },
+    {
+        "title": "bar",
+        "description": "bar",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg/960px-The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg",
+        "email": "this is definetly not an email",
+        "username": "testuser2",
+        "first_name": "test2",
+        "last_name": "user2"
+    },
+    {
+        "title": "broken link",
+        "description": "url is baaaaad",
+        "img": "https://gallerix.ru/fullpic/97e9a70b2ba3efe1d2cc0c8c863bddf4/",
+        "email": "user2@gmail.com",
+        "username": "testuser3",
+        "first_name": "test3",
+        "last_name": "user3"
+    }
+]

@@ -241,32 +241,34 @@ def extend_exception_for_response(exception):
     return exception
 
 
+def convert_exception_detail_to_dict(exception_detail):
+    if hasattr(exception_detail, "translation_key"):
+        translation_key = exception_detail.translation_key
+    else:
+        translation_key = "invalid"
+    if hasattr(exception_detail, "message"):
+        message = exception_detail.message
+    else:
+        message = exception_detail.__str__()
+    if hasattr(exception_detail, "additional_info"):
+        additional_info = exception_detail.additional_info
+    else:
+        additional_info = {}
+    return {
+        "translation_key": translation_key,
+        "message": message,
+        "additional_info": additional_info,
+    }
+
+
 def create_details_dict_with_nested_details(exception_details):
     detail_list = []
     detail_dict = {}
     if isinstance(exception_details, list):
         for exception_detail in exception_details:
             if isinstance(exception_detail, Exception):
-                if hasattr(exception_detail, "translation_key"):
-                    translation_key = exception_detail.translation_key
-                else:
-                    translation_key = "invalid"
-                if hasattr(exception_detail, "message"):
-                    message = exception_detail.message
-                else:
-                    message = exception_detail.__str__()
-                if hasattr(exception_detail, "additional_info"):
-                    additional_info = exception_detail.additional_info
-                else:
-                    additional_info = {}
-                detail_list.append(
-                    {
-                        "translation_key": translation_key,
-                        "message": message,
-                        "additional_info": additional_info,
-                    }
-                )
-            else:
+                detail_list.append(convert_exception_detail_to_dict(exception_detail))
+            else: # if it's not an Exception, then its a nested dict
                 details = {}
                 for field, exception_details in exception_detail.items():
                     details[field] = create_details_dict_with_nested_details(
@@ -278,25 +280,7 @@ def create_details_dict_with_nested_details(exception_details):
             dict_detail_list = []
             for exception_detail in exception_detail_list:
                 if isinstance(exception_detail, Exception):
-                    if hasattr(exception_detail, "translation_key"):
-                        translation_key = exception_detail.translation_key
-                    else:
-                        translation_key = "invalid"
-                    if hasattr(exception_detail, "message"):
-                        message = exception_detail.message
-                    else:
-                        message = exception_detail.__str__()
-                    if hasattr(exception_detail, "additional_info"):
-                        additional_info = exception_detail.additional_info
-                    else:
-                        additional_info = {}
-                    dict_detail_list.append(
-                        {
-                            "translation_key": translation_key,
-                            "message": message,
-                            "additional_info": additional_info,
-                        }
-                    )
+                    dict_detail_list.append(convert_exception_detail_to_dict(exception_detail))
                 else:
                     details = {}
                     for field, exception_details in exception_detail.items():

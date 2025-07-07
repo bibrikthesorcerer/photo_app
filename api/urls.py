@@ -11,6 +11,7 @@ urlpatterns = [
     path('comments/<int:comment_id>', views.SingleCommentView.as_view(),name='single_comment'),
 
     path('photos', views.PhotosView.as_view(), name='photos'),
+    path('photos:import', views.ImportPhotosView.as_view(), name='import_photos'),
     path('photos/<int:photo_id>', views.SinglePhotoView.as_view(), name='single_photo'),
     path('photos/<int:photo_id>:recover', views.RecoverPhotoView.as_view(), name='recover_photo'),
     
@@ -18,5 +19,6 @@ urlpatterns = [
     
     path('photos/<int:photo_id>/likes', views.LikesView.as_view(), name='photo_likes'),
     
-    path('review_tickets/<int:ticket_id>', views.ReviewTicketView.as_view(), name="review_tickets")
+    path('review_tickets/<int:ticket_id>', views.ReviewTicketView.as_view(), name="review_tickets"),
+
 ]

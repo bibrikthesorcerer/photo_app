@@ -1,0 +1,20 @@
+[
+    {
+        "title": "foo",
+        "description": "foo",
+        "img": "https://www.libpng.org/pub/png/img_png/pnglogo--povray-3.7--black826--800x600.png",
+        "email": "testemail1@gmail.com",
+        "username": "testuser1",
+        "first_name": "test1",
+        "last_name": "user1"
+    },
+    {
+        "title": "bar",
+        "description": "bar",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg/960px-The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg",
+        "email": "testemail2@gmail.com",
+        "username": "testuser2",
+        "first_name": "test2",
+        "last_name": "user2"
+    }
+]

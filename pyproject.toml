@@ -32,6 +32,7 @@ rich = "^13.9.4"
 aiosmtpd = "^1.4.6"
 djangorestframework-simplejwt = {extras = ["crypto"], version = "^5.5.0"}
 drf-spectacular = "^0.28.0"
+djangorestframework-api-key = "^3.1.0"
 
 
 [build-system]

@@ -1,11 +1,14 @@
+from io import BytesIO
 import pathlib
-from service_objects.services import ServiceWithResult
+import requests
+from service_objects.services import ServiceWithResult, ServiceOutcome
 from service_objects.errors import ValidationError, Error
-from service_objects.fields import ModelField
+from service_objects.fields import ModelField, ListField
 from django import forms
 from rest_framework import status
 from django.contrib.contenttypes.models import ContentType
 from decouple import config
+from django.core.files.images import ImageFile
 from django.db.models import Q
 
 from models_app.models import Photo, PhotoVersion, UserProfile, Comment
@@ -137,3 +140,70 @@ class RecoverPhotoFromDeletion(ServiceWithResult):
         review_ticket = self.photo_obj.review_tickets.first()
         self.photo_obj.status = review_ticket.result if review_ticket else Photo.ON_MODERATION
         self.photo_obj.save()
+
+
+class ImportPhoto(ServiceWithResult):
+    title = forms.CharField(max_length=64)
+    description = forms.CharField(max_length=256)
+    img = forms.URLField()
+    pub_date = forms.DateField(required=False)
+    email = forms.EmailField()
+    username = forms.CharField(max_length=150)
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
+
+    def process(self):
+        self.result = self._import_photo()
+        return self
+
+    def _import_photo(self):
+        photo_author, is_created = self._get_or_create_photo_author()
+        img = self._get_photo_img()
+        return Photo.objects.create(
+            user=photo_author,
+            title=self.cleaned_data.get("title"),
+            description=self.cleaned_data.get("description"),
+            pub_date=self.cleaned_data.get("pub_date"),
+            img=img
+        )
+
+    def _get_photo_img(self) -> ImageFile:
+        response = requests.get(self.cleaned_data.get("img")) # get img from url
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            self.add_error("img", e)
+        return ImageFile(
+            file=BytesIO(response.content),
+            name=self.cleaned_data.get("title"),
+        )
+
+    def _get_or_create_photo_author(self) -> UserProfile:
+        return UserProfile.objects.get_or_create(
+            username=self.cleaned_data.get("username"),
+            defaults={
+                "email": self.cleaned_data.get("email"),
+                "first_name": self.cleaned_data.get("first_name"),
+                "last_name": self.cleaned_data.get("last_name")
+            }
+        )
+
+
+class ImportPhotosList(ServiceWithResult):
+    photo_list = ListField()
+
+    def process(self):
+        photo_list = self.cleaned_data.get("photo_list")
+        for photo_num, photo in enumerate(photo_list):
+            self._launch_import_for_photo(photo, photo_num)
+        return self
+
+        
+    def _launch_import_for_photo(self, photo_info: dict, photo_num):
+        try:
+            ServiceOutcome(
+                ImportPhoto,
+                photo_info
+            )
+        except Exception as e:
+            self.add_error(photo_num, e)

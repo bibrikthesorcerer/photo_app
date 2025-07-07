@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'log_request_id',
     'drf_spectacular',
+    "rest_framework_api_key",
 ]
 
 SIMPLE_JWT = {

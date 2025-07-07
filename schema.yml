@@ -211,6 +211,46 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/photos:import:
+    post:
+      operationId: photos:import_create
+      summary: Import Photos from json.
+      tags:
+      - photos:import
+      requestBody:
+        content:
+          title:
+            schema:
+              type: string
+          description:
+            schema:
+              type: string
+          img:
+            schema:
+              type: string
+              format: uri
+          pub_date:
+            schema:
+              type: string
+              format: date-time
+          email:
+            schema:
+              type: string
+              format: email
+          username:
+            schema:
+              type: string
+          first_name:
+            schema:
+              type: string
+          last_name:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Incorrect data provided.
   /api/review_tickets/{ticket_id}:
     patch:
       operationId: review_tickets_partial_update
