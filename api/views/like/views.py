@@ -33,7 +33,7 @@ class LikesView(BaseView):
     def delete(self, request, *args, **kwargs):
         self._get_like_with_permission_check()
         outcome = ServiceOutcome(
-            DeleteLike, # TODO: add method on Like model so we could pass instance to service and just delete it without using additional queryset
+            DeleteLike,
             ({"user_id": request.user.id} | kwargs)
         )
         data = RetrieveLikeSerializer(outcome.result).data

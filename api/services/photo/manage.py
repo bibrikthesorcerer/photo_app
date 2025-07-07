@@ -6,10 +6,12 @@ from django import forms
 from rest_framework import status
 from django.contrib.contenttypes.models import ContentType
 from decouple import config
+from django.db.models import Q
 
-from models_app.models import Photo, PhotoVersion
+from models_app.models import Photo, PhotoVersion, UserProfile, Comment
 from api.services.photo_version.create import CreatePhotoVersion
 from api.tasks import delete_photo_by_id
+from notifications.utils.senders import send_message_to_list_of_users
 
 
 class UpdatePhoto(ServiceWithResult):
@@ -78,6 +80,7 @@ class SchedulePhotoDeletion(ServiceWithResult):
         self.run_custom_validations()
         self._set_status_to_tbd()
         self._schedule_task()
+        self._send_notification_for_comment_authors()
         return self
 
     def _photo_status_not_tbd(self):
@@ -93,6 +96,19 @@ class SchedulePhotoDeletion(ServiceWithResult):
         delete_photo_by_id.apply_async(
             (self.photo_obj.id,),
             countdown=config('PHOTO_DELETION_COUNTDOWN', default=20, cast=int)
+        )
+
+    def _get_comment_authors(self) -> list:
+        comments = Comment.objects.filter(Q(photo=self.photo_obj) & ~Q(user=self.photo_obj.user))
+        idx = comments.values_list("user", flat=True).distinct()
+        return idx
+
+    def _send_notification_for_comment_authors(self):
+        idx = self._get_comment_authors()
+        send_message_to_list_of_users(
+            idx,
+            "send_notification",
+            f"Photo '{self.photo_obj.title}' which you had commented is scheduled to be deleted with all comments you have left."
         )
 
 class RecoverPhotoFromDeletion(ServiceWithResult):

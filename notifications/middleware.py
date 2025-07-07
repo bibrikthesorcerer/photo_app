@@ -17,7 +17,6 @@ class JWTAuthMiddleware:
         tokens = params.get("token")
         if tokens:
             user: AbstractBaseUser = await self.get_user_from_jwt(tokens[0])
-            print(user)
             if user and not user.is_anonymous:
                 scope["user"] = user
         
