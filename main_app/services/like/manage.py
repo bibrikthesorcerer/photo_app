@@ -48,7 +48,7 @@ class SendLikeNotification(ServiceWithResult):
         photo_obj = RetrievePhoto.execute({**self.cleaned_data})
         user = self.cleaned_data.get('user')
         # do not notify on self-like
-        if user == photo_obj.user.id:
+        if user == photo_obj.user:
             return
         
         is_like = self.cleaned_data.get('is_like')

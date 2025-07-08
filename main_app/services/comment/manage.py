@@ -25,7 +25,7 @@ class SendCommentNotification(ServiceWithResult):
         photo_obj = RetrievePhoto.execute({**self.cleaned_data})
         user = self.cleaned_data.get('user')
         # do not notify on self-comment
-        if user == photo_obj.user.id:
+        if user == photo_obj.user:
             return
         curr_comments = photo_obj.comments_count
         send_message_to_list_of_users(
