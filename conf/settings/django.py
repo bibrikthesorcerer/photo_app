@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config, Csv
+import os
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -29,8 +30,8 @@ INSTALLED_APPS = [
     'service_objects',
     'imagekit',
     'django_extensions',
-    'viewflow',
     'main_app.apps.MainAppConfig',
+    'viewflow',
     'notifications.apps.NotificationsConfig',
     'log_request_id'
 ]
@@ -94,6 +95,7 @@ SOCIAL_AUTH_GITHUB_SCOPE = ['read:user','user:email']
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['username', 'email', 'first_name', 'last_name']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/profile/'
 
 
 # Password validation

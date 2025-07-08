@@ -2,9 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views import View
+from django.contrib.auth.views import LoginView
+from service_objects.services import ServiceOutcome
+from django.contrib.auth import login
 
-from models_app.admin.user_profile.forms import UserProfileForm
-from main_app.services import ListPhotos, GetUserGithubPFP, UpdateUserProfile
+from models_app.admin.user_profile.forms import UserProfileForm, UserProfileLoginForm
+from main_app.services import ListPhotos, GetUserGithubPFP, UpdateUserProfile, CreateUser
+from models_app.admin.user_profile.forms import UserProfileCreationForm
 
 
 class UserProfileView(LoginRequiredMixin, View):
@@ -38,3 +42,26 @@ class UserProfileView(LoginRequiredMixin, View):
             return redirect('main_app:profile')
         
         return self.get(request, *args, **kwargs)
+    
+
+class UserSignupView(View):
+    template_name='registration/signup.html'
+
+    def get(self, request):
+        return render(request, self.template_name, {"form": UserProfileCreationForm()})
+
+    def post(self, request):
+        outcome = ServiceOutcome(
+            CreateUser,
+            request.POST
+        )
+        user, form = outcome.result
+        if user:
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return redirect("main_app:profile")
+        else:
+            return render(request, self.template_name, {"form": form})
+        
+    
+class UserLoginView(LoginView):
+    authentication_form = UserProfileLoginForm

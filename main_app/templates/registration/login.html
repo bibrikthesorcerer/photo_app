@@ -1,0 +1,63 @@
+{% extends 'main_app/base.html' %}
+
+{% block body %}
+    <div class="row row-cols-auto justify-content-center align-items-center">
+        <div class="card m-5">
+            <div class="card-title m-3 mb-0 fs-5">
+                Login into your account.
+                <div class="form-text">Enter your credentials below to login to your account</div>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning" role="alert">
+                        Your account doesn't have access to this page. To proceed, please login with an account that has access.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        Please login to see this page.
+                    </div>
+                    {% endif %}
+                {% endif %}
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fs-5">Username</label>
+                        <input name="username" type="text" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-end">
+                            <label class="form-label fs-5">Password</label>
+                            <label class="form-label"><a href="{% url 'password_reset' %}">Forgot your password?</a></label>
+                        </div>
+                        <input name="password" type="password" class="form-control">
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                        <button type="submit" class="btn btn-primary m-1" value="login">Login</button>
+                        <input type="hidden" name="next" value="{{ next }}">
+                        <a type="button" class="btn btn-secondary m-1" role="button"
+                        href="{% url 'social:begin' 'github' %}">
+                            Login with GitHub
+                        </a>
+                        <label class="form-text m-1">Don't have an account? <a href="{% url 'signup' %}">Sign up</a>.</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

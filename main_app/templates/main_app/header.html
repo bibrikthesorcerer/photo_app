@@ -61,11 +61,9 @@
             </div>
 
             {% else %}
-
-            <!-- GitHub OAuth redirect -->
-            <a type="button" class="btn btn-success" role="button"
-            href="{% url 'social:begin' 'github' %}">
-                Login via GitHub
+            <a type="button" class="btn btn-primary" role="button"
+            href="{% url 'login' %}">
+                Get started
             </a>
             {% endif %}
         </div>
