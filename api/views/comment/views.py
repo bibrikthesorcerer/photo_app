@@ -44,11 +44,6 @@ class SingleCommentView(BaseView):
             self.permission_classes = [IsOwner]
         return super().get_permissions()
     
-    def get_comment_with_permission_check(self):
-        outcome = ServiceOutcome(RetrieveComment, self.kwargs)
-        comment = outcome.result
-        self.check_object_permissions(self.request, comment)
-        return comment
 
     def get(self, request, *args, **kwargs):
         outcome = ServiceOutcome(RetrieveComment, kwargs)
@@ -57,7 +52,7 @@ class SingleCommentView(BaseView):
         return Response(data)
         
     def put(self, request, *args, **kwargs):
-        comment = self.get_comment_with_permission_check()
+        comment = self._get_object_with_permission_check(RetrieveComment)
         update_outcome = ServiceOutcome(
             UpdateCommentText,
             {"comment": comment}|request.data
@@ -66,7 +61,7 @@ class SingleCommentView(BaseView):
         return Response(data)
         
     def delete(self, request, *args, **kwargs):
-        comment = self.get_comment_with_permission_check()
+        comment = self._get_object_with_permission_check(RetrieveComment)
         outcome = ServiceOutcome(DeleteComment, {'comment': comment})
         comment, is_deleted = outcome.result
         data = RetrieveCommentSerializer(comment).data

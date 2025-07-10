@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["bibrikthesorcerer <ignatsahovsky@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -20,7 +21,7 @@ Django = "^5.1"
 psycopg2 = "^2.9.9"
 social-auth-app-django = "^5.4.2"
 redis = "^5.2.1"
-django-service-objects = {git = "https://git.snpdev.ru/saltpepper/django-service-objects.git"}
+django-service-objects = {git = "https://git.snpdev.ru/saltpepper/django-service-objects.git", branch="master"}
 django-extensions = "^3.2.3"
 pyparsing = "^3.2.1"
 pydot = "^3.0.4"
@@ -33,6 +34,7 @@ aiosmtpd = "^1.4.6"
 djangorestframework-simplejwt = {extras = ["crypto"], version = "^5.5.0"}
 drf-spectacular = "^0.28.0"
 djangorestframework-api-key = "^3.1.0"
+service-objects-autodocs = {git = "https://git.snpdev.ru/saltpepper/service-objects-autodocs"}
 
 
 [build-system]

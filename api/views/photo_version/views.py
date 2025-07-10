@@ -11,14 +11,8 @@ from api.serializers import RetrievePhotoVersionSerializer
 class PhotoVersionView(BaseView):
     permission_classes = [IsOwner]
 
-    def _get_photo_with_permission_check(self):
-        outcome = ServiceOutcome(RetrievePhoto, self.kwargs)
-        obj = outcome.result
-        self.check_object_permissions(self.request, obj)
-        return obj
-
     def get(self, request, *args, **kwargs):
-        photo = self._get_photo_with_permission_check()
+        photo = self._get_object_with_permission_check(RetrievePhoto)
         outcome = ServiceOutcome(
             ListPhotoVersions, 
             ({"photo": photo} | kwargs)

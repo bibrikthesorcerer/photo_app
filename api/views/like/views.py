@@ -24,14 +24,8 @@ class LikesView(BaseView):
         data = RetrieveLikeSerializer(outcome.result).data
         return Response(data, status=status.HTTP_201_CREATED)
     
-    def _get_like_with_permission_check(self):
-        outcome = ServiceOutcome(RetrieveLike, ({"user_id": self.request.user.id} | self.kwargs))
-        like = outcome.result
-        self.check_object_permissions(self.request, like)
-        return like
-
     def delete(self, request, *args, **kwargs):
-        self._get_like_with_permission_check()
+        self._get_object_with_permission_check(RetrieveLike, {"user_id": self.request.user.id})
         outcome = ServiceOutcome(
             DeleteLike,
             ({"user_id": request.user.id} | kwargs)
