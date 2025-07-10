@@ -5,6 +5,7 @@ from models_app.admin.user_profile.forms import UserProfileCreationForm
 
 class CreateUser(ServiceWithResult):
     username = forms.CharField()
+    email = forms.EmailField()
     password1 = forms.CharField()
     password2 = forms.CharField()
 

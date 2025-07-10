@@ -19,6 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 INSTALLED_APPS = [
     'daphne',
     'models_app.apps.ModelsAppConfig',
+    'main_app.apps.MainAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,7 +31,6 @@ INSTALLED_APPS = [
     'service_objects',
     'imagekit',
     'django_extensions',
-    'main_app.apps.MainAppConfig',
     'viewflow',
     'notifications.apps.NotificationsConfig',
     'log_request_id'
@@ -97,6 +97,13 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/profile/'
 
+
+# Email
+DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 # Password validation
 

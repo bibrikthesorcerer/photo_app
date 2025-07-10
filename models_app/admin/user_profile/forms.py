@@ -36,9 +36,20 @@ class AdminUserProfileForm(ModelForm):
 
 
 class UserProfileCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, help_text="This email will be used to reset your password if needed. No spam, we promise.")
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data.get("email")
+        if commit:
+            user.save()
+            if hasattr(self, "save_m2m"):
+                self.save_m2m()
+        return user
+
     class Meta:
         model = UserProfile
-        fields = ("username", "password1", "password2")
+        fields = ("username", "email", "password1", "password2")
 
 
 class UserProfileLoginForm(AuthenticationForm):
