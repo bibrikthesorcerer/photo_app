@@ -13,7 +13,8 @@ class UserProfileForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        if self.instance.pk:
+            self.fields['username'].disabled = True
         for _, elem in self.fields.items():
             elem.widget.attrs["class"] = "form-control"
 
@@ -28,6 +29,8 @@ class AdminUserProfileForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['username'].disabled = True
         for _, elem in self.fields.items():
             elem.widget.attrs["class"] = "form-control"
 

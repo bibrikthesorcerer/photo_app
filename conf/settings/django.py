@@ -94,6 +94,16 @@ SOCIAL_AUTH_GITHUB_SCOPE = ['read:user','user:email']
 
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['username', 'email', 'first_name', 'last_name']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'main_app.pipeline.get_or_create_user',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/profile/'
 

@@ -27,7 +27,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         return redirect(request.get_full_path())
 
     def get_form(self, request, obj=None, **kwargs):
-        if (request.user.role == UserProfile.ROLE_ADMIN 
+        if (obj and request.user.role == UserProfile.ROLE_ADMIN 
             and obj.role != UserProfile.ROLE_ADMIN):
             self.form = AdminUserProfileForm
             return super().get_form(request, obj, **kwargs)
