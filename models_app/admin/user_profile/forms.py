@@ -65,15 +65,10 @@ class UserProfileLoginForm(AuthenticationForm):
                 user = UserProfile.objects.get(username=username)
             except UserProfile.DoesNotExist:
                 user = None
-
-            try:
-                social_auth = UserSocialAuth.objects.get(user=user)
-            except UserSocialAuth.DoesNotExist:
-                social_auth = None
             
-            if user and social_auth:
+            if user and not user.has_usable_password():
                 raise forms.ValidationError(
-                    f"Your account was created using OAuth({social_auth.provider.capitalize()}). Login using {social_auth.provider.capitalize()}.",
+                    f"Your account probably was created using OAuth and you have not set password yet. Login using OAuth or set password by signing-up with your email again.",
                     code="social_account"
                 )
         return super().clean()

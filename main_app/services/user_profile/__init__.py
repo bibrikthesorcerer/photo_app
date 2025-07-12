@@ -1,2 +1,2 @@
-from .manage import GetUserGithubPFP, UpdateUserProfile
+from .manage import GetUserGithubPFP, UpdateUserProfile, FormAccountLinkEmail, SetPasswordForUser
 from .create import CreateUser
