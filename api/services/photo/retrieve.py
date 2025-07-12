@@ -8,7 +8,7 @@ from models_app.models import Photo, Like
 
 class RetrievePhoto(ServiceWithResult):
     photo_id = forms.IntegerField()
-    user_id = forms.IntegerField(required=False)
+    user_id = forms.IntegerField(required=False, help_text="id of user, used to add user actions on Photo instance (e.g. is_liked)")
 
     def process(self):
         self.result = self._get_photo_instance()

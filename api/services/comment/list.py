@@ -11,12 +11,12 @@ class ListComments(ServiceWithResult):
         ("pub_date", "", ),
         ("-pub_date", "", ),
     )
-    photo_id = forms.IntegerField(required=False)
-    roots_only = forms.BooleanField(required=False)
+    photo_id = forms.IntegerField(required=False, help_text="List comments which were left under specified photo.")
+    roots_only = forms.BooleanField(required=False, help_text="Whether or not to show only comments who have no parent (i.e. roots).")
     page = forms.IntegerField(required=False)
-    per_page = forms.IntegerField(required=False)
+    per_page = forms.IntegerField(required=False, help_text=f"Pagination parameter, set to {config('COMMENTS_PER_PAGE', default=20)}")
     order = forms.ChoiceField(choices=ORDER_CHOICES, initial="-pub_date", required=False)
-    id = forms.IntegerField(required=False)
+    id = forms.IntegerField(required=False, help_text="Root comment's id. Will result in listing comments who are descendants of comment with given id.")
 
     def process(self) -> Page:
         self.result = self._get_paginated_queryset()

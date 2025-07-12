@@ -41,3 +41,13 @@ class ImportPhotosTest(APITestCase):
             format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_import_incorrect_api_key_403(self):
+        response = self.client.post(
+            path=reverse("api:import_photos"),
+            data=self.correct_json_data,
+            headers={"Authorization": f"Api-Key ${self.key}$"},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

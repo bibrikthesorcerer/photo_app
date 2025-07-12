@@ -13,6 +13,7 @@ from api.services import (ListPhotos, CreatePhoto, RetrievePhoto,
                           ImportPhotosList)
 from api.serializers import PageSerializer, PhotoSerializer
 from api.permissions import IsOwner
+from api.docs import photo
 
 
 class PhotosView(BaseView):
@@ -21,10 +22,14 @@ class PhotosView(BaseView):
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
     
+    @extend_schema(**photo.list_photos_docs)
     def get(self, request, *args, **kwargs):
+        inputs = request.query_params
+        if request.user.is_authenticated:
+            inputs.update({"user": request.user})
         outcome = ServiceOutcome(
             ListPhotos,
-            request.query_params
+            inputs
         )
         data = PageSerializer(
             instance=outcome.result,
@@ -32,6 +37,7 @@ class PhotosView(BaseView):
         ).data
         return Response(data)
 
+    @extend_schema(**photo.create_photo_docs)
     def post(self, request, *args, **kwargs):
         outcome = ServiceOutcome(
             CreatePhoto,
@@ -54,19 +60,7 @@ class SinglePhotoView(BaseView):
         self.check_object_permissions(self.request, object)
         return object
 
-    @extend_schema(
-        summary="Get single Photo using id.",
-        parameters=[
-            OpenApiParameter(name="photo_id", location="path", type=int, description="id of Photo to be retrieved"),
-            OpenApiParameter(name="user", location="query", required=False, type=int,
-                             description="id of user, used to add user actions on Photo instance (e.g. is_liked)"
-            )
-        ],
-        responses={
-            200: PhotoSerializer,
-            404: OpenApiResponse(description="Photo with given id not found")
-        },
-    )
+    @extend_schema(**photo.retrieve_photo_docs)
     def get(self, request, *args, **kwargs):
         outcome = ServiceOutcome(
             RetrievePhoto,
@@ -75,22 +69,7 @@ class SinglePhotoView(BaseView):
         data = PhotoSerializer(outcome.result).data
         return Response(data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        summary="Update Photo's information.",
-        parameters=[
-            OpenApiParameter(name="photo_id", location="path", type=int, description="id of Photo to be updated"),
-        ],
-        request={
-            "img": OpenApiTypes.BINARY,
-            "title": OpenApiTypes.STR,
-            "description": OpenApiTypes.STR
-        },
-        responses={
-            200: PhotoSerializer,
-            400: OpenApiResponse(description="No values for new fields provided"),
-            404: OpenApiResponse(description="Photo with given id not found")
-        },
-    )
+    @extend_schema(**photo.update_photo_docs)
     def put(self, request, *args, **kwargs):
         if request.data is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -103,17 +82,7 @@ class SinglePhotoView(BaseView):
         data = PhotoSerializer(outcome.result).data
         return Response(data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        summary="Schedule Photo's delayed deletion.",
-        parameters=[
-            OpenApiParameter(name="photo_id", location="path", type=int, description="id of Photo to be deleted"),
-        ],
-        responses={
-            202: OpenApiResponse(description="Operation scheduled"),
-            404: OpenApiResponse(description="Photo with given id not found"),
-            410: OpenApiResponse(description="Photo already set to be deleted")
-        },
-    )
+    @extend_schema(**photo.delete_photo_docs)
     def delete(self, request, *args, **kwargs):
         photo = self._get_photo_with_permission_check()
         outcome = ServiceOutcome(
@@ -125,6 +94,7 @@ class SinglePhotoView(BaseView):
 class RecoverPhotoView(BaseView):
     permission_classes = [IsOwner]
     
+    @extend_schema(**photo.recover_photo_docs)
     def put(self, request, *args, **kwargs):
         photo = self._get_object_with_permission_check(RetrievePhoto)
         outcome = ServiceOutcome(
@@ -138,23 +108,7 @@ class ImportPhotosView(BaseView):
     authentication_classes = []
     permission_classes = [HasAPIKey]
 
-    @extend_schema(
-        summary="Import Photos from json.",
-        request={
-            "title": OpenApiTypes.STR,
-            "description": OpenApiTypes.STR,
-            "img": OpenApiTypes.URI,
-            "pub_date": OpenApiTypes.DATETIME,
-            "email": OpenApiTypes.EMAIL,
-            "username": OpenApiTypes.STR,
-            "first_name": OpenApiTypes.STR,
-            "last_name": OpenApiTypes.STR,
-        },
-        responses={
-            200: {},
-            400: OpenApiResponse(description="Incorrect data provided."),
-        },
-    )
+    @extend_schema(**photo.import_photos_docs)
     def post(self, request, *args, **kwargs):
         if type(request.data) != list:
             return Response(status=status.HTTP_400_BAD_REQUEST)

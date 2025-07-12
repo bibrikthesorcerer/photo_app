@@ -9,7 +9,7 @@ class UpdateUserProfile(ServiceWithResult):
     username = forms.CharField(required=False)
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
-    email = forms.EmailField(required=False)
+    # email = forms.EmailField(required=False)
 
     def process(self) -> UserProfile:
         self.result = self._update_user_fields()

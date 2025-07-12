@@ -1,4 +1,5 @@
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from api import views
 
@@ -20,5 +21,9 @@ urlpatterns = [
     path('photos/<int:photo_id>/likes', views.LikesView.as_view(), name='photo_likes'),
     
     path('review_tickets/<int:ticket_id>', views.ReviewTicketView.as_view(), name="review_tickets"),
+
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name=f'{app_name}:schema'), name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name=f'{app_name}:schema'), name='redoc'),
 
 ]

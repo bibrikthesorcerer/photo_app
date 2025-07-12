@@ -9,12 +9,16 @@ from models_app.models import Photo, UserProfile, Like
 
 
 class ListPhotos(ServiceWithResult):
-    entry = forms.CharField(required=False)
+    entry = forms.CharField(required=False, help_text="String for searching through photos. Search happens in title, description and author name.")
     user = ModelField(UserProfile, required=False)
-    author_id = forms.IntegerField(required=False)
+    author_id = forms.IntegerField(required=False, help_text="Filter photos by author.")
     per_page = forms.IntegerField(required=False)
     page = forms.IntegerField(required=False)
-    status = forms.ChoiceField(choices=Photo.STATUS_CHOICES, required=False)
+    status = forms.ChoiceField(
+        choices=Photo.STATUS_CHOICES,
+        required=False,
+        help_text=""
+    )
 
     ORDER_CHOICES = (
         ("likes_count", "", ),

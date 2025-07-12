@@ -171,15 +171,15 @@ class ImportPhoto(ServiceWithResult):
         response = requests.get(self.cleaned_data.get("img")) # get img from url
         try:
             response.raise_for_status()
-        except requests.HTTPError as e:
-            self.add_error("img", e)
+        except requests.HTTPError:
+            self.add_error("img", ValidationError(message="Unable to fetch image. Check URL and it's accessibility"))
         return ImageFile(
             file=BytesIO(response.content),
             name=self.cleaned_data.get("title"),
         )
 
     def _get_or_create_photo_author(self) -> UserProfile:
-        return UserProfile.objects.get_or_create(
+        user, is_created = UserProfile.objects.get_or_create(
             username=self.cleaned_data.get("username"),
             defaults={
                 "email": self.cleaned_data.get("email"),
@@ -187,6 +187,10 @@ class ImportPhoto(ServiceWithResult):
                 "last_name": self.cleaned_data.get("last_name")
             }
         )
+        if is_created:
+            user.set_unusable_password()
+            user.save()
+        return user, is_created
 
 
 class ImportPhotosList(ServiceWithResult):

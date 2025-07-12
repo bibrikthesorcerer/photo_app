@@ -40,7 +40,7 @@ class CreateComment(ServiceWithResult):
         try:
             self.parent_comment = Comment.objects.get(id=parent_id) if parent_id else None
         except Comment.DoesNotExist:
-            self.add_error("parent_id", NotFound(message="Parent comment with given id not found"))
+            self.add_error("parent_id", ValidationError(message="Parent comment with given id not found"))
             self.stop_process()
     
     def _photo_exists(self):
@@ -51,7 +51,7 @@ class CreateComment(ServiceWithResult):
                 self.cleaned_data
             ).result
         except Photo.DoesNotExist:
-            self.add_error("photo_id", NotFound(message="Photo with given id not found"))
+            self.add_error("photo_id", ValidationError(message="Photo with given id not found"))
             self.stop_process()
 
     def _send_notification_for_photo_author(self):

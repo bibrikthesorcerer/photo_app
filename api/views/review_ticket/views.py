@@ -1,16 +1,19 @@
 from rest_framework import status
 from rest_framework.response import Response
 from service_objects.services import ServiceOutcome
+from drf_spectacular.utils import extend_schema
 
 from api.views import BaseView
 from api.permissions import IsOwner
 from api.serializers import RetrieveReviewTicketSerializer
 from api.services import RetrieveReviewTicket, SetReviewTicketToSeen
+from api.docs import review_ticket
 
 
 class ReviewTicketView(BaseView):
     permission_classes = [IsOwner]
 
+    @extend_schema(**review_ticket.set_ticket_to_seen_docs)
     def patch(self, request, *args, **kwargs):
         outcome = ServiceOutcome(
             SetReviewTicketToSeen,
