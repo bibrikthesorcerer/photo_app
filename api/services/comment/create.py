@@ -1,6 +1,6 @@
 from service_objects.services import ServiceWithResult, ServiceOutcome
 from service_objects.fields import ModelField
-from service_objects.errors import ValidationError, NotFound
+from service_objects.errors import ValidationError, ServiceObjectLogicError
 from rest_framework import status
 from django import forms
 
@@ -50,7 +50,7 @@ class CreateComment(ServiceWithResult):
                 RetrievePhoto,
                 self.cleaned_data
             ).result
-        except Photo.DoesNotExist:
+        except ServiceObjectLogicError:
             self.add_error("photo_id", ValidationError(message="Photo with given id not found"))
             self.stop_process()
 
