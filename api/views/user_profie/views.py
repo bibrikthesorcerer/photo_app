@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 from service_objects.services import ServiceOutcome
 
-from api.serializers import UserProfileSerializer, ShowAccessTokenSerializer
-from api.services import UpdateUserProfile, CreateUserProfile, SetNewUserApiToken
+from api.services import UpdateUserProfile, CreateUserProfile, SetNewUserApiToken, AuthenticateUserAndRenewApiToken
+from api.serializers import UserProfileSerializer
 from api.docs import user_profile
 from api.views import BaseView
 
@@ -37,5 +37,16 @@ class UsersView(BaseView):
             SetNewUserApiToken,
             {"user": user}
         ).result
-        data = ShowAccessTokenSerializer(token).data
-        return Response(data=data)
+        return Response(data={"token": str(token)})
+    
+
+class UserTokenView(BaseView):
+    
+    @extend_schema(**user_profile.authenticate_user_docs)
+    def post(self, request):
+        token = ServiceOutcome(
+            AuthenticateUserAndRenewApiToken,
+            request.data
+        ).result
+        return Response(data={"token": str(token)})
+    

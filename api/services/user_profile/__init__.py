@@ -1,3 +1,3 @@
 from .update import UpdateUserProfile
 from .create import CreateUserProfile
-from .manage import SetNewUserApiToken
+from .manage import SetNewUserApiToken, AuthenticateUserAndRenewApiToken

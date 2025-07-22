@@ -1,1 +1,1 @@
-from .views import CurrentUserView, UsersView
+from .views import CurrentUserView, UsersView, UserTokenView
