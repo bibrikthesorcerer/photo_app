@@ -20,3 +20,6 @@ class UserProfile(AbstractUser, BaseModel):
         verbose_name = "user_profile"
         verbose_name_plural = "user_profiles"
         db_table = "user_profiles"
+        constraints = [
+            models.UniqueConstraint(fields=["email"], name="unique_email_for_user")
+        ]
