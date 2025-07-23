@@ -1,1 +1,1 @@
-from .views import UserProfileView, GenerateUserAPIToken
+from .views import UserProfileView, GenerateUserAPIToken, UserLoginView, UserSignupView, VerifyPasswordView

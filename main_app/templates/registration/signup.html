@@ -23,7 +23,7 @@
                 </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'signup' %}">
+                <form method="post" action="{% url 'main_app:signup' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="form-label fs-5">Username</label>
@@ -52,7 +52,7 @@
                         href="{% url 'social:begin' 'github' %}">
                             Signup with GitHub
                         </a>
-                        <label class="form-text m-1">Already have an account? <a href="{% url 'login' %}">Login</a>.</label>
+                        <label class="form-text m-1">Already have an account? <a href="{% url 'main_app:login' %}">Login</a>.</label>
                     </div>
                 </form>
             </div>

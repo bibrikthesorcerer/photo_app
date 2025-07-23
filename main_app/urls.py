@@ -4,6 +4,9 @@ from . import views
 app_name = 'main_app'
 
 urlpatterns = [
+    path('accounts/signup/', views.UserSignupView.as_view(), name="signup"),
+    path('accounts/login/', views.UserLoginView.as_view(), name="login"),
+    path('accounts/verify_password/<user_idb64>/<token>/', views.VerifyPasswordView.as_view(), name="verify_password"),
     path('', views.IndexView.as_view(), name='index'),
     path('profile/', views.UserProfileView.as_view(), name='profile'),
     path('upload/', views.UploadPhoto.as_view(), name='upload'),

@@ -3,6 +3,6 @@ Hi {{ user.email }},
 You're receiving this because you tried to add a password to your OAuth account.
 
 Please confirm to add password login option:
-{{ protocol }}://{{ domain }}{% url 'verify_password' user_idb64=user_idb64 token=token %}
+{{ protocol }}://{{ domain }}{% url 'main_app:verify_password' user_idb64=user_idb64 token=token %}
 
 If this wasn't you, ignore this email.
