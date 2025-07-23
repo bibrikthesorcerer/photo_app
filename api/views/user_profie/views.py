@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 from service_objects.services import ServiceOutcome
 
-from api.services import UpdateUserProfile, CreateUserProfile, SetNewUserApiToken, AuthenticateUserAndRenewApiToken
 from api.serializers import UserProfileSerializer
+from api.services import UpdateUserProfile, CreateUserProfile, SetNewUserApiToken, AuthenticateUserAndRenewApiToken, DeleteUserApiToken
 from api.docs import user_profile
 from api.views import BaseView
 
@@ -41,6 +41,11 @@ class UsersView(BaseView):
     
 
 class UserTokenView(BaseView):
+
+    def get_permissions(self):
+        if self.request.method == "DELETE":
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
     
     @extend_schema(**user_profile.authenticate_user_docs)
     def post(self, request):
@@ -50,3 +55,9 @@ class UserTokenView(BaseView):
         ).result
         return Response(data={"token": str(token)})
     
+    def delete(self, request):
+        ServiceOutcome(
+            DeleteUserApiToken,
+            {"user": request.user}
+        )
+        return Response()

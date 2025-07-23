@@ -3,7 +3,7 @@ from service_objects.services import ServiceWithResult, ServiceOutcome
 from service_objects.fields import ModelField
 from service_objects.errors import ValidationError, AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decouple import config
 
 from models_app.models import UserProfile
@@ -21,9 +21,9 @@ class SetNewUserApiToken(ServiceWithResult):
         return self
     
     def _delete_old_token(self):
-        old_token_str = retrieve_value(f'access_tokens:{self.user.username}')
+        old_token_str = retrieve_value(f'access_tokens:{self.user.id}')
         if old_token_str is not None:
-            delete_value(f'access_tokens:{self.user.username}')
+            delete_value(f'access_tokens:{self.user.id}')
 
     def _generate_new_token(self) -> AccessToken:
         new_token = AccessToken().for_user(self.user)
@@ -33,9 +33,9 @@ class SetNewUserApiToken(ServiceWithResult):
                 from_time=new_token.current_time,
                 lifetime=timedelta(seconds=lifetime)
             )
-        new_token.created = datetime.fromtimestamp(new_token['iat']).strftime('%Y-%m-%d %H:%M:%S')
+        new_token.payload["created"] = datetime.now(timezone.utc).timestamp()
         redis_ttl = lifetime or config("ACCESS_TOKEN_LIFETIME")
-        cache_value(f'access_tokens:{self.user.username}', str(new_token), redis_ttl)
+        cache_value(f'access_tokens:{self.user.id}', str(new_token), redis_ttl)
         return new_token
     
 
@@ -68,3 +68,21 @@ class AuthenticateUserAndRenewApiToken(ServiceWithResult):
             SetNewUserApiToken,
             {"user": self.user}
         ).result
+
+
+class DeleteUserApiToken(ServiceWithResult):
+    user = ModelField(UserProfile)
+
+    def process(self):
+        self.user = self.cleaned_data.get("user")
+        self._renew_valid_token_ts()
+        self._delete_token()
+        return self
+    
+    def _delete_token(self):
+        token_str = retrieve_value(f'access_tokens:{self.user.id}')
+        if token_str is not None:
+            delete_value(f'access_tokens:{self.user.id}')
+
+    def _renew_valid_token_ts(self):
+        cache_value(f'access_tokens:rot_timestamp:{self.user.id}', datetime.now(timezone.utc).timestamp())

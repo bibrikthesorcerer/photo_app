@@ -11,7 +11,7 @@ from models_app.admin.user_profile.forms import UserProfileForm
 from main_app.tokens import account_oauth_link_token_generator
 from decouple import config
 from rest_framework_simplejwt.tokens import AccessToken
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from main_app.utils.redis import cache_value, retrieve_value, delete_value
 
@@ -87,7 +87,7 @@ class GetUserAPIToken(ServiceWithResult):
 
     def process(self):
         user = self.cleaned_data.get('user')
-        token_str = retrieve_value(f'access_tokens:{user.username}')
+        token_str = retrieve_value(f'access_tokens:{user.id}')
         try:
             self.result = AccessToken(token_str)
             self.result.created = datetime.fromtimestamp(self.result['iat']).strftime('%Y-%m-%d %H:%M:%S')
@@ -102,7 +102,7 @@ class IssueNewUserAPIToken(ServiceWithResult):
     def _clean_old_token(self, user):
         token = GetUserAPIToken.execute({"user":user})
         if token is not None:
-            delete_value(f'access_tokens:{user.username}')
+            delete_value(f'access_tokens:{user.id}')
 
     def _generate_new_token(self, user):
         new_token = AccessToken().for_user(user)
@@ -112,9 +112,9 @@ class IssueNewUserAPIToken(ServiceWithResult):
                 from_time=new_token.current_time,
                 lifetime=timedelta(seconds=lifetime)
             )
-        new_token.created = datetime.fromtimestamp(new_token['iat']).strftime('%Y-%m-%d %H:%M:%S')
+        new_token.payload["created"] = datetime.now(timezone.utc).timestamp()
         redis_ttl = self.cleaned_data.get("lifetime") or config("ACCESS_TOKEN_LIFETIME")
-        cache_value(f'access_tokens:{user.username}', str(new_token), redis_ttl)
+        cache_value(f'access_tokens:{user.id}', str(new_token), redis_ttl)
         return new_token
 
     def process(self):
