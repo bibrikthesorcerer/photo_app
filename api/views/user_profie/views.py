@@ -47,7 +47,7 @@ class UserTokenView(BaseView):
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
     
-    @extend_schema(**user_profile.authenticate_user_docs)
+    @extend_schema(**user_profile.renew_token_docs)
     def post(self, request):
         token = ServiceOutcome(
             AuthenticateUserAndRenewApiToken,
@@ -55,6 +55,7 @@ class UserTokenView(BaseView):
         ).result
         return Response(data={"token": str(token)})
     
+    @extend_schema(**user_profile.forget_tokens_docs)
     def delete(self, request):
         ServiceOutcome(
             DeleteUserApiToken,

@@ -40,11 +40,19 @@ create_new_user_docs = {
     },
 }
 
-authenticate_user_docs = {
+renew_token_docs = {
     "summary": "Check user credentials and return fresh Api token for given user",
     "request": prepare_request_body_for_docs(AuthenticateUserAndRenewApiToken),
     "responses": {
         "200": OpenApiTypes.STR,
         "400": get_validation_error_yasg_response(),
+    },
+}
+
+forget_tokens_docs = {
+    "summary": "Logout user, reject all tokens issued before this logout",
+    "responses": {
+        "200": {},
+        "401": get_authentication_failed_yasg_response(),
     },
 }
