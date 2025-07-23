@@ -145,5 +145,5 @@ class GenerateUserAPIToken(LoginRequiredMixin, View):
         token = IssueNewUserAPIToken.execute({"user":request.user})
         return JsonResponse({
             'token': str(token),
-            'created': token.created
+            'created': token.payload.get('created')
         })

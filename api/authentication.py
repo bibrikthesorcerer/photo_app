@@ -1,10 +1,22 @@
 from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework_simplejwt.tokens import AccessToken
+from datetime import datetime
 
 from models_app.models import UserProfile
+from api.utils import retrieve_value
 
 class RedisJWTAuth(authentication.BaseAuthentication):
+
+    def authenticate(self, request):
+        raw_token = self._parse_header(request)
+        if raw_token is None:
+            return None
+        provided_token = self._retrieve_provided_token(raw_token)
+        if self._is_rotten(provided_token):
+            return None
+        self.user = self._get_user_instance(provided_token['user_id'])
+        return (self.user, None)
 
     def _get_user_instance(self, uid):
         try:
@@ -44,11 +56,9 @@ class RedisJWTAuth(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(
                 f"Invalid token provided: {e.args[0]}"
             )
-
-    def authenticate(self, request):
-        raw_token = self._parse_header(request)
-        if raw_token is None:
-            return None
-        provided_token = self._retrieve_provided_token(raw_token)
-        user = self._get_user_instance(provided_token['user_id'])
-        return (user, None)
+        
+    def _is_rotten(self, token):
+        rot_ts = retrieve_value(f'access_tokens:rot_timestamp:{token['user_id']}')
+        if rot_ts is None:
+            return False
+        return True if float(token.payload.get('created')) < float(rot_ts) else False
