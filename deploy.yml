@@ -1,0 +1,118 @@
+- hosts: all
+  user: "{{ project }}"
+  vars:
+    projectName: "{{ project }}"
+    user: "{{ project }}"
+    type: "{{ build_type }}"
+
+  tasks:
+    - name: Set username
+      set_fact:
+        remote_user: "{{ user }}"
+        shared_dir: /var/www/{{ projectName }}/ss/shared 
+        tmp_dir: /var/www/{{ projectName }}/ss/releases/{{ansible_date_time.date}}
+
+    - name: Copy project src
+      synchronize:
+        src: ./
+        dest: "{{ tmp_dir }}"
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=deploy.yml"
+          - "--exclude=poetry.lock"
+          - "--exclude=.pre-commit-config.yaml"
+
+    - name: Make symlink for .env
+      file:
+        src: "{{ shared_dir }}/config/.env"
+        dest: "{{ tmp_dir }}/.env"
+        state: link
+        force: yes
+
+    - name: Make symlink for gunicorn_config
+      file:
+        src: "{{ shared_dir }}/config/gunicorn_config.py"
+        dest: "{{ tmp_dir }}/gunicorn_config.py"
+        state: link
+        force: yes
+
+    - name: Make symlink for .venv
+      file:
+        src: "{{ shared_dir }}/.venv"
+        dest: "{{ tmp_dir }}/.venv"
+        state: link
+        force: yes
+
+    - name: Make symlink for media
+      file:
+        src: "{{ shared_dir }}/media"
+        dest: "{{ tmp_dir }}/media"
+        state: link
+        force: yes
+
+    - name: Make symlink for logs
+      file:
+        src: "{{ shared_dir }}/logs"
+        dest: "{{ tmp_dir }}/logs"
+        state: link
+        force: yes
+
+    - name: Install dependencies with Poetry
+      command: /home/{{ projectName }}/.local/bin/poetry install --no-interaction
+      args:
+        chdir: "{{ tmp_dir }}"
+      environment:
+        PIP_CACHE_DIR: /tmp/pip-cache  
+
+
+    - name: Run database migrations
+      command: /home/{{ projectName }}/.local/bin/poetry run python manage.py migrate
+      args:
+        chdir: "{{ tmp_dir }}"
+
+    - name: Create static folder
+      file:
+        path: "{{ tmp_dir }}/static"
+        state: directory
+
+
+    - name: Collect static files
+      command: /home/{{ projectName }}/.local/bin/poetry run python manage.py collectstatic --noinput
+      args:
+        chdir: "{{ tmp_dir }}"
+
+    - name: Update current release symlink
+      file:
+        path: /var/www/{{ projectName }}/ss/current
+        src: "{{ tmp_dir }}"
+        state: link
+        force: yes
+
+    - name: Restart gunicorn service
+      shell: sudo systemctl restart gunicorn.service
+
+    - name: Restart daphne service
+      shell: sudo systemctl restart daphne.service
+
+    - name: Restart celery service
+      shell: sudo systemctl restart celery.service
+
+    - name: Delete previous deployments
+      block:
+        - name: Get current deployment path
+          command: readlink -f /var/www/{{ projectName }}/ss/current
+          register: current_deploy_path
+
+        - name: Find all releases 
+          find:
+            paths: /var/www/{{ projectName }}/ss/releases
+            file_type: directory
+          register: old_releases
+
+        - name: Remove old deployments
+          file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ old_releases.files }}"
+          when: 
+            - item.path != current_deploy_path.stdout
