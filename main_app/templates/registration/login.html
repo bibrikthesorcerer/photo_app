@@ -38,14 +38,14 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="form-label fs-5">Username</label>
-                        <input name="username" type="text" class="form-control">
+                        <input name="username" required type="text" class="form-control">
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-end">
                             <label class="form-label fs-5">Password</label>
                             <label class="form-label"><a href="{% url 'password_reset' %}">Forgot your password?</a></label>
                         </div>
-                        <input name="password" type="password" class="form-control">
+                        <input name="password" required type="password" class="form-control">
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                         <button type="submit" class="btn btn-primary m-1" value="login">Login</button>
