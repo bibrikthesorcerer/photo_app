@@ -15,21 +15,16 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     date_joined = fuzzy.FuzzyDateTime(start_dt=timezone.now().replace(year=2024))
-    role = fuzzy.FuzzyChoice([UserProfile.ROLE_USER, UserProfile.ROLE_MOD, UserProfile.ROLE_ADMIN])
-    password = factory.PostGenerationMethodCall('set_password', 'testpass123')
+    role = fuzzy.FuzzyChoice(
+        [UserProfile.ROLE_USER, UserProfile.ROLE_MOD, UserProfile.ROLE_ADMIN]
+    )
+    password = factory.PostGenerationMethodCall("set_password", "testpass123")
 
     class Params:
         admin = factory.Trait(
-            role=UserProfile.ROLE_ADMIN,
-            is_staff=True,
-            is_superuser=True
+            role=UserProfile.ROLE_ADMIN, is_staff=True, is_superuser=True
         )
-        moderator = factory.Trait(
-            role=UserProfile.ROLE_MOD,
-            is_staff=True
-        )
+        moderator = factory.Trait(role=UserProfile.ROLE_MOD, is_staff=True)
         user = factory.Trait(
-            role=UserProfile.ROLE_USER,
-            is_staff=False,
-            is_superuser=False
+            role=UserProfile.ROLE_USER, is_staff=False, is_superuser=False
         )
