@@ -36,11 +36,11 @@
         </div>
         <div class="card-footer">
           {% if user.is_authenticated and ph.is_liked %}
-            <span class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
+            <button class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</button>
           {% else %}
-            <span class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</span>
+            <button class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{ph.id}}">{{ph.likes_count}} ❤</button>
           {% endif %}
-          <a href="{% url 'main_app:view_photo' ph.id %}#commentModal" class="btn badge rounded-pill text-bg-primary comment-button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</a>
+          <a href="{% url 'main_app:view_photo' ph.id %}#commentModal" class="btn badge rounded-pill text-bg-primary comment-button" role="button" data-photo-id="{{ph.id}}">{{ph.comments_count}} 🗨️</a>
         </div>
       </div>
     </div>

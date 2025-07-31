@@ -29,13 +29,13 @@
                     <hr>
                     <div style="font-size: 2em;">
                         {% if request.user.is_authenticated and photo.is_liked %}
-                            <span id="likesCount" class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{photo.id}}">
+                            <button id="likesCount" class="btn badge rounded-pill text-bg-danger like-button" data-photo-id="{{photo.id}}">
                                 {{photo.likes_count}} ❤
-                            </span>
+                            </button>
                         {% else %}
-                            <span id="likesCount" class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{photo.id}}">
+                            <button id="likesCount" class="btn badge rounded-pill text-bg-primary like-button" data-photo-id="{{photo.id}}">
                                 {{photo.likes_count}} ❤
-                            </span>
+                            </button>
                         {% endif %}
                             <span id="commentsCount" data-bs-toggle="modal" data-bs-target="#commentModal" 
                             class="btn badge rounded-pill text-bg-primary comment-button" 

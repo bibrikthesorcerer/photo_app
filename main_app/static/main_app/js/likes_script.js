@@ -10,6 +10,7 @@ likeButtonsArray.forEach((elem) => {
 })
 
 function likeAJAX(elem){
+    elem.disabled = true
     photo_id = elem.getAttribute('data-photo-id')
     if (elem.classList.contains('text-bg-primary')){
         createLikeAJAX(elem, photo_id);
@@ -34,6 +35,7 @@ function createLikeAJAX(elem, photo_id){
                 numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
                 numOfLikes++;
                 elem.innerHTML = '' + numOfLikes + ' ❤';
+                elem.disabled = false;
             },
             error: function(xhr){
                 console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
@@ -42,6 +44,7 @@ function createLikeAJAX(elem, photo_id){
                     $(toast).find(".toast-body:first").html(xhr.responseJSON.message)
                     $(toast).toast('show');
                 }
+                elem.disabled = false;
             }
         });
 }
@@ -61,6 +64,7 @@ function removeLikeAJAX(elem, photo_id){
                 numOfLikes = parseInt(elem.innerHTML.match(/(\d+)/)[0]);
                 numOfLikes--;
                 elem.innerHTML = '' + numOfLikes + ' ❤';
+                elem.disabled = false;
             },
             error: function(xhr){
                 console.error('ERROR. SERVER RESPONDED:', JSON.parse(xhr.responseText).error);
@@ -69,6 +73,7 @@ function removeLikeAJAX(elem, photo_id){
                     $(toast).find(".toast-body:first").html(xhr.responseJSON.message)
                     $(toast).toast('show');
                 }
+                elem.disabled = false;
             }
         });
 }
